@@ -17,7 +17,7 @@ namespace Loger_Bloger
             IBazaPodataka bazaPodataka = null; // TODO: Initialize the database with appropriate implementation
 
             // Repozitorijumi
-            IKorisniciRepozitorijum korisniciRepozitorijum = new  KorisniciRepozitorijum(bazaPodataka);
+            IKorisniciRepozitorijum korisniciRepozitorijum = new KorisniciRepozitorijum(bazaPodataka);
 
             // Servisi
             IAutentifikacijaServis autentifikacijaServis = new  AutentifikacioniServis(); // TODO: Pass necessary dependencies
