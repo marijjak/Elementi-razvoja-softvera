@@ -14,7 +14,7 @@ namespace Loger_Bloger
         public static void Main()
         {
             // Baza podataka
-            IBazaPodataka bazaPodataka = null; // TODO: Initialize the database with appropriate implementation
+            IBazaPodataka bazaPodataka = null; // TODO: Initialize the database with appropriate  implementation
 
             // Repozitorijumi
             IKorisniciRepozitorijum korisniciRepozitorijum = new KorisniciRepozitorijum(bazaPodataka);
