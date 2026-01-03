@@ -8,6 +8,6 @@ namespace Domain.Repozitorijumi
 {
     public interface IBiljkeRepozitorijum
     {
-        // Definicija metoda za rad sa biljkama ce ici ovde
+        // Definicija metoda za rad sa biljkama ovde
     }
 }
