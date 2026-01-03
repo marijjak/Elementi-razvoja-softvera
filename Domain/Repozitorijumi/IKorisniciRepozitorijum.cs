@@ -9,3 +9,4 @@ namespace Domain.Repozitorijumi
         public IEnumerable<Korisnik> SviKorisnici();
     }
 }
+ 

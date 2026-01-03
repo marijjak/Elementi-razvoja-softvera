@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Enumeracije
 {
-    public enum StanjeBiljke
+    public enum StanjeBiljke 
     {
         Posadjena,
         Ubrana,

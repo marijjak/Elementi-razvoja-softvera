@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Modeli
 {
-    public class Biljka
+    public  class Biljka
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public string OpstiNaziv { get; set; } = string.Empty;

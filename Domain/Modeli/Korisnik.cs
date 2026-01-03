@@ -14,7 +14,7 @@ namespace Domain.Modeli
 
         public Korisnik(string korisnickoIme, string lozinka, string imePrezime, TipKorisnika tipKorisnika)
         {
-            KorisnickoIme = korisnickoIme;
+            KorisnickoIme = korisnickoIme; 
             Lozinka = lozinka;
             ImePrezime = imePrezime;
             Uloga = tipKorisnika;

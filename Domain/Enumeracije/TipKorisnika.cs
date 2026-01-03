@@ -3,6 +3,6 @@
     public enum TipKorisnika
     {
         Prodavac,
-        MenadzerProdaje 
+        MenadzerProdaje  
     }
 }
