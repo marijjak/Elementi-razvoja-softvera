@@ -8,7 +8,7 @@ namespace Domain.BazaPodataka
         public List<Biljka> Biljka { get; set; } = [];
         public List<Biljka> Biljke { get; set; } = [];
 
-        // TODO: Add other database tables as needed
+        //  Add other database tables as needed
 
         public TabeleBazaPodataka() { }
     }

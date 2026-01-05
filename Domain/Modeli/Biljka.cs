@@ -5,9 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
+
 namespace Domain.Modeli
 {
-    public  class Biljka
+    public class Biljka
     {
         public Guid Id { get; private set; } 
         public string OpstiNaziv { get; private set; } = string.Empty;
@@ -17,10 +19,10 @@ namespace Domain.Modeli
         public StanjeBiljke Stanje { get; private set; } = StanjeBiljke.Posadjena;
         public Biljka() { }  //za json
         public Biljka(
-        string opstiNaziv,
-        string latinskiNaziv,
-        int jacinaArome,
-        string zemljaPorekla)
+            string opstiNaziv,
+            string latinskiNaziv,
+            int jacinaArome,
+            string zemljaPorekla)
         {
             Id= Guid.NewGuid();
             OpstiNaziv = opstiNaziv;
