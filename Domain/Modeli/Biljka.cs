@@ -9,24 +9,30 @@ namespace Domain.Modeli
 {
     public  class Biljka
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
-        public string OpstiNaziv { get; set; } = string.Empty;
-        public string LatinskiNaziv { get; set; } = string.Empty;
-        public int JacinaArome { get; set; }   // 1–5 
-        public string ZemljaPorekla { get; set; } = string.Empty;
-        public StanjeBiljke Stanje { get; set; } = StanjeBiljke.Posadjena;
-        public Biljka() { }
+        public Guid Id { get; private set; } 
+        public string OpstiNaziv { get; private set; } = string.Empty;
+        public string LatinskiNaziv { get;private  set; } = string.Empty;
+        public int JacinaArome { get;private set; }   // 1–5 
+        public string ZemljaPorekla { get; private set; } = string.Empty;
+        public StanjeBiljke Stanje { get; private set; } = StanjeBiljke.Posadjena;
+        public Biljka() { }  //za json
         public Biljka(
         string opstiNaziv,
         string latinskiNaziv,
         int jacinaArome,
         string zemljaPorekla)
         {
+            Id= Guid.NewGuid();
             OpstiNaziv = opstiNaziv;
             LatinskiNaziv = latinskiNaziv;
             JacinaArome = jacinaArome;
             ZemljaPorekla = zemljaPorekla;
             Stanje = StanjeBiljke.Posadjena;
+        }
+
+        public void PromeniStanje(StanjeBiljke novoStanje)
+        {
+            Stanje = novoStanje;
         }
         public override string ToString()
         {

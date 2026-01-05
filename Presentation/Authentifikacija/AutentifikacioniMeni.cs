@@ -1,4 +1,5 @@
-﻿using Domain.Modeli;
+﻿using Domain.Enumeracije;
+using Domain.Modeli;
 using Domain.Servisi;
 
 namespace Presentation.Authentifikacija
@@ -18,6 +19,7 @@ namespace Presentation.Authentifikacija
             bool uspesnaPrijava = false;
             string? korisnickoIme = "", lozinka = "";
 
+            Console.WriteLine("\n========== PRIJAVA ==========");
             Console.Write("Korisničko ime: ");
             korisnickoIme = Console.ReadLine() ?? "";
 
@@ -27,6 +29,46 @@ namespace Presentation.Authentifikacija
             (uspesnaPrijava, korisnik) = autentifikacijaServis.Prijava(korisnickoIme.Trim(), lozinka.Trim());
 
             return uspesnaPrijava;
+        }
+
+        public bool TryRegister(out Korisnik korisnik)
+        {
+            korisnik = new Korisnik();
+            bool uspesnaRegistracija = false;
+
+            Console.WriteLine("\n========== REGISTRACIJA ==========");
+
+            Console.Write("Korisničko ime: ");
+            string korisnickoIme = Console.ReadLine() ?? "";
+
+            Console.Write("Lozinka: ");
+            string lozinka = Console.ReadLine() ?? "";
+
+            Console.Write("Ime i prezime: ");
+            string imePrezime = Console.ReadLine() ?? "";
+
+            Console.WriteLine("\nIzaberite ulogu:");
+            Console.WriteLine("1. Prodavac");
+            Console.WriteLine("2. Menadžer prodaje");
+            Console.Write("Uloga (1-2): ");
+            string ulogaOpcija = Console.ReadLine() ?? "";
+
+            TipKorisnika uloga = ulogaOpcija.Trim() == "2"
+                ? TipKorisnika.MenadzerProdaje
+                : TipKorisnika.Prodavac;
+
+            // Kreiranje novog korisnika
+            Korisnik noviKorisnik = new Korisnik(
+                korisnickoIme.Trim(),
+                lozinka.Trim(),
+                imePrezime.Trim(),
+                uloga
+            );
+
+            // Pokušaj registracije
+            (uspesnaRegistracija, korisnik) = autentifikacijaServis.Registracija(noviKorisnik);
+
+            return uspesnaRegistracija;
         }
     }
 }

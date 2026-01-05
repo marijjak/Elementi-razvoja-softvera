@@ -6,6 +6,7 @@ namespace Domain.BazaPodataka
     {
         public List<Korisnik> Korisnici { get; set; } = [];
         public List<Biljka> Biljka { get; set; } = [];
+        public List<Biljka> Biljke { get; set; } = [];
 
         // TODO: Add other database tables as needed
 
