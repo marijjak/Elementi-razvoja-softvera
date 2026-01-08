@@ -12,5 +12,6 @@ namespace Domain.Servisi
         Biljka DodajBiljku(Biljka biljka);
         void PromeniStanje(Guid biljkaId);
         IEnumerable<Biljka> SveBiljke();
+        bool ZasadiNovuBiljku(string naziv, string latinski, string zemlja, double jacina);
     }
 }

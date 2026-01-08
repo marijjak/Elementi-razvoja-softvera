@@ -35,5 +35,17 @@ namespace Database.Repozitorijumi
         {
             return _baza.Tabele.Biljke;
         }
+        public void ObrisiPrazne()
+        {
+            // Pronalazi sve biljke koje nemaju naziv (one koje prave problem)
+            var zaBrisanje = _baza.Tabele.Biljke.Where(b => string.IsNullOrEmpty(b.OpstiNaziv)).ToList();
+
+            foreach (var b in zaBrisanje)
+            {
+                _baza.Tabele.Biljke.Remove(b);
+            }
+
+            _baza.SacuvajPromene();
+        }
     }
 }

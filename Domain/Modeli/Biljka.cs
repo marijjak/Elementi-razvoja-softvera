@@ -11,12 +11,12 @@ namespace Domain.Modeli
 {
     public class Biljka
     {
-        public Guid Id { get; private set; } 
-        public string OpstiNaziv { get; private set; } = string.Empty;
-        public string LatinskiNaziv { get;private  set; } = string.Empty;
-        public int JacinaArome { get;private set; }   // 1–5 
-        public string ZemljaPorekla { get; private set; } = string.Empty;
-        public StanjeBiljke Stanje { get; private set; } = StanjeBiljke.Posadjena;
+        public Guid Id { get;  set; } 
+        public string OpstiNaziv { get;  set; } = string.Empty;
+        public string LatinskiNaziv { get;  set; } = string.Empty;
+        public double JacinaArome { get; set; }   // 1–5 
+        public string ZemljaPorekla { get;  set; } = string.Empty;
+        public StanjeBiljke Stanje { get;  set; } = StanjeBiljke.Posadjena;
         public Biljka() { }  //za json
         public Biljka(
             string opstiNaziv,
@@ -36,9 +36,6 @@ namespace Domain.Modeli
         {
             Stanje = novoStanje;
         }
-        public override string ToString()
-        {
-            return $"{OpstiNaziv} ({LatinskiNaziv}) | Aroma: {JacinaArome} | {ZemljaPorekla} | {Stanje}";
-        }
+       
     }
 }

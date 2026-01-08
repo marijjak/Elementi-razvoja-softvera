@@ -46,6 +46,28 @@ namespace Services
         {
             return _repo.Sve();
         }
-    
-}
+        public bool ZasadiNovuBiljku(string naziv, string latinski, string zemlja, double jacina)
+        {
+            try
+            {
+                // Kreiramo novi model biljke
+             
+                Biljka novaBiljka = new Biljka(naziv, latinski,(int)jacina, zemlja);
+
+                // Postavljamo početno stanje prema zahtevu zadatka
+                novaBiljka.PromeniStanje(StanjeBiljke.Posadjena);
+
+             
+                _repo.Dodaj(novaBiljka);
+
+                
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+    }
 }

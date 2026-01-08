@@ -7,6 +7,7 @@ using Domain.Repozitorijumi;
 using Domain.Servisi;
 using Presentation.Authentifikacija;
 using Presentation.Meni;
+using Services;
 using Services.AutenftikacioniServisi;
 
 namespace Loger_Bloger
@@ -20,11 +21,14 @@ namespace Loger_Bloger
 
             // Repozitorijumi
             IKorisniciRepozitorijum korisniciRepozitorijum = new KorisniciRepozitorijum(bazaPodataka);
-            // TODO: Dodati ostale repozitorijume (IBiljkeRepozitorijum, itd.)
+            IBiljkeRepozitorijum biljkeRepozitorijum = new BiljkeRepozitorijum(bazaPodataka);
+            // TODO: Dodati ostale repozitorijume 
+            biljkeRepozitorijum.ObrisiPrazne();
 
             // Servisi
             IAutentifikacijaServis autentifikacijaServis = new AutentifikacioniServis(korisniciRepozitorijum);
-            // TODO: Dodati ostale servise (IBiljkeServis, itd.)
+            IBiljkeServis biljkeServis = new BiljkeServis(biljkeRepozitorijum);
+            // TODO: Dodati ostale servise 
 
             // Ako nema nijednog korisnika u sistemu, dodati dva nova
             if (korisniciRepozitorijum.SviKorisnici().Count() == 0)
@@ -122,7 +126,7 @@ namespace Loger_Bloger
             // Glavni meni aplikacije
             OpcijeMeni meni = new OpcijeMeni(
                 autentifikacijaServis,
-                null, // TODO: Dodati IBiljkeServis kada bude implementiran
+                biljkeServis, // TODO: Dodati IBiljkeServis kada bude implementiran
                 prijavljen
             );
             meni.PrikaziGlavniMeni();

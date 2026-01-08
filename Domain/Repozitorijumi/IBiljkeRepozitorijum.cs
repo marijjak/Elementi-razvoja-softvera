@@ -11,5 +11,6 @@ using System.Text;
         Biljka Dodaj(Biljka biljka);
         Biljka NadjiPoId(Guid id);
         IEnumerable<Biljka> Sve();
+        void ObrisiPrazne();
     }
 }

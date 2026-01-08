@@ -36,8 +36,13 @@ namespace Presentation.Meni
                 {
                     Console.WriteLine("2. Menadžerske opcije");
                 }
+                else
+                {
+                    Console.WriteLine("3. Pregeld biljaka");
 
-                Console.WriteLine("0. Odjava");
+                }
+
+                    Console.WriteLine("0. Odjava");
                 Console.Write("Izbor: ");
 
                 string izbor = Console.ReadLine() ?? "";
@@ -57,6 +62,9 @@ namespace Presentation.Meni
                         {
                             Pauza("Nemate pravo pristupa.");
                         }
+                        break;
+                    case "3":
+                        PregledBiljaka();
                         break;
 
                     case "0":
@@ -101,8 +109,8 @@ namespace Presentation.Meni
                 switch (izbor.Trim())
                 {
                     case "1":
-                        // TODO: Implementirati kada bude servis
-                        Pauza("Funkcionalnost u razvoju...");
+                        Console.WriteLine("Dodajte novu biljku:");
+                        DodajNovuBiljku();
                         break;
 
                     case "2":
@@ -126,8 +134,25 @@ namespace Presentation.Meni
             Console.Clear();
             Console.WriteLine("\n===== PREGLED BILJAKA =====");
 
-            // TODO: Implementirati kada bude spremno
-            Console.WriteLine("Lista biljaka će biti ovde...");
+       
+            var biljke = _biljkeServis.SveBiljke();
+
+            if (biljke == null || !biljke.Any())
+            {
+                Console.WriteLine("Trenutno nema dostupnih biljaka u bazi.");
+            }
+            else
+            {
+                foreach (var b in biljke)
+                {
+                    Console.WriteLine($"Naziv: {b.OpstiNaziv,-10} | " +
+                        $"Latinski: {b.LatinskiNaziv,-10} | " +
+                        $"Poreklo: {b.ZemljaPorekla,-12} | " +
+                        $"Jacina: {b.JacinaArome:F1} | " +
+                        $"Stanje: {b.Stanje}");
+                }
+            }
+
 
             Pauza("Pritisnite bilo koji taster...");
         }
@@ -138,6 +163,34 @@ namespace Presentation.Meni
             Console.WriteLine(poruka);
             Console.WriteLine("\nPritisnite bilo koji taster...");
             Console.ReadKey();
+        }
+        // ==================== DODAJ BILJKU ====================
+        private void DodajNovuBiljku()
+        {
+            Console.Clear();
+            Console.WriteLine("\n===== DODAVANJE NOVE BILJKE =====");
+
+            Console.Write("Opšti naziv: ");
+            string naziv = Console.ReadLine() ?? "";
+
+            Console.Write("Latinski naziv: ");
+            string latinski = Console.ReadLine() ?? "";
+
+            Console.Write("Zemlja porekla: ");
+            string zemlja = Console.ReadLine() ?? "";
+
+            Console.Write("Jačina arome (1.0 - 5.0): ");
+            if (!double.TryParse(Console.ReadLine(), out double jacina)) jacina = 1.0;
+
+            // Poziv servisa koji će preko repozitorijuma sačuvati biljku u JSON
+            bool uspeh = _biljkeServis.ZasadiNovuBiljku(naziv, latinski, zemlja, jacina);
+
+            if (uspeh)
+                Console.WriteLine("\nUspeh: Biljka je zasađena i trajno sačuvana u JSON bazi.");
+            else
+                Console.WriteLine("\nGreška: Došlo je do problema prilikom čuvanja.");
+
+            Pauza("");
         }
     }
 }
