@@ -36,6 +36,16 @@ namespace Domain.Modeli
         {
             Stanje = novoStanje;
         }
-       
+        public void PromeniJacinuArome(double procenat)
+        {
+            // Izračunavanje nove jačine
+            double novaJacina = JacinaArome * (1 + procenat / 100);
+
+            // Ograničavanje na opseg 1.0 - 5.0
+            if (novaJacina < 1.0) novaJacina = 1.0;
+            if (novaJacina > 5.0) novaJacina = 5.0;
+
+            JacinaArome = novaJacina;
+        }
     }
 }

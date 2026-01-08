@@ -59,14 +59,24 @@ namespace Services
 
              
                 _repo.Dodaj(novaBiljka);
+             
 
-                
                 return true;
             }
             catch (Exception)
             {
                 return false;
             }
+        }
+        public bool IzmeniMirisBiljke(Guid id, double procenat)
+        {
+            var biljka = _repo.NadjiPoId(id); // Pronalaženje biljke
+            if (biljka == null) return false;
+
+            biljka.PromeniJacinuArome(procenat);
+
+            _repo.Dodaj(biljka); 
+            return true;
         }
 
     }

@@ -20,7 +20,22 @@ namespace Database.Repozitorijumi
 
         public Biljka Dodaj(Biljka biljka)
         {
-            _baza.Tabele.Biljke.Add(biljka);
+            // Proveravamo da li ta biljka već postoji u bazi preko ID-ja
+            var postojeca = _baza.Tabele.Biljke.FirstOrDefault(b => b.Id == biljka.Id);
+
+            if (postojeca != null)
+            {
+                // Ako postoji, ažuriramo njena polja (npr. JacinaArome)
+                postojeca.JacinaArome = biljka.JacinaArome;
+                postojeca.Stanje = biljka.Stanje;
+                // Dodaj i ostala polja ako je potrebno
+            }
+            else
+            {
+                // Ako ne postoji, dodajemo je kao novu
+                _baza.Tabele.Biljke.Add(biljka);
+            }
+
             _baza.SacuvajPromene();
             return biljka;
         }

@@ -101,6 +101,7 @@ namespace Presentation.Meni
                 Console.WriteLine("\n===== MENADŽERSKE OPCIJE =====");
                 Console.WriteLine("1. Upravljanje biljkama");
                 Console.WriteLine("2. Pregled biljaka");
+                Console.WriteLine("3. Prilagodi jačinu mirisa biljke");
                 Console.WriteLine("0. Nazad");
                 Console.Write("Izbor: ");
 
@@ -115,6 +116,9 @@ namespace Presentation.Meni
 
                     case "2":
                         PregledBiljaka();
+                        break;
+                    case "3":
+                        PrilagodiMirisBiljke();
                         break;
 
                     case "0":
@@ -190,6 +194,33 @@ namespace Presentation.Meni
             else
                 Console.WriteLine("\nGreška: Došlo je do problema prilikom čuvanja.");
 
+            Pauza("");
+        }
+        private void PrilagodiMirisBiljke()
+        {
+            Console.Clear();
+            PregledBiljaka(); // Prvo prikažemo listu da korisnik vidi ID ili naziv
+
+            Console.Write("\nUnesite naziv biljke za promenu: ");
+            string naziv = Console.ReadLine() ?? "";
+
+            // Pronađi prvu biljku sa tim nazivom
+            var biljka = _biljkeServis.SveBiljke().FirstOrDefault(b => b.OpstiNaziv.Equals(naziv, StringComparison.OrdinalIgnoreCase));
+
+            if (biljka != null)
+            {
+                Console.Write("Unesite procenat promene (npr. 20 za povećanje, -10 za smanjenje): ");
+                if (double.TryParse(Console.ReadLine(), out double procenat))
+                {
+                    biljka.PromeniJacinuArome(procenat);
+                    _biljkeServis.DodajBiljku(biljka); 
+                    Console.WriteLine($"\nNova jačina mirisa za {biljka.OpstiNaziv} je: {biljka.JacinaArome:F1}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Biljka nije pronađena.");
+            }
             Pauza("");
         }
     }
