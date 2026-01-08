@@ -183,8 +183,21 @@ namespace Presentation.Meni
             Console.Write("Zemlja porekla: ");
             string zemlja = Console.ReadLine() ?? "";
 
-            Console.Write("Jačina arome (1.0 - 5.0): ");
-            if (!double.TryParse(Console.ReadLine(), out double jacina)) jacina = 1.0;
+            double jacina;
+            while (true)
+            {
+                Console.Write("Jačina arome (1.0 - 5.0): ");
+                string unos = Console.ReadLine() ?? "";
+
+                // Proveravamo da li je unos broj i da li je u dozvoljenim granicama
+                if (double.TryParse(unos, out jacina) && jacina >= 1.0 && jacina <= 5.0)
+                {
+                    break; // Unos je ispravan, izlazimo iz petlje
+                }
+
+                Console.WriteLine("Greška: Neispravan unos. Jačina mora biti broj između 1.0 i 5.0.");
+            }
+
 
             // Poziv servisa koji će preko repozitorijuma sačuvati biljku u JSON
             bool uspeh = _biljkeServis.ZasadiNovuBiljku(naziv, latinski, zemlja, jacina);
