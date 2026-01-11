@@ -22,12 +22,15 @@ namespace Loger_Bloger
             // Repozitorijumi
             IKorisniciRepozitorijum korisniciRepozitorijum = new KorisniciRepozitorijum(bazaPodataka);
             IBiljkeRepozitorijum biljkeRepozitorijum = new BiljkeRepozitorijum(bazaPodataka);
+            IDogadjajiRepozitorijum dogadjajiRepozitorijum = new DogadjajiRepozitorijum(bazaPodataka);
+
             // TODO: Dodati ostale repozitorijume 
             biljkeRepozitorijum.ObrisiPrazne();
 
             // Servisi
             IAutentifikacijaServis autentifikacijaServis = new AutentifikacioniServis(korisniciRepozitorijum);
-            IBiljkeServis biljkeServis = new BiljkeServis(biljkeRepozitorijum);
+            IDogadjajiServis dogadjajiServis = new DogadjajiServis(dogadjajiRepozitorijum);
+            IBiljkeServis biljkeServis = new BiljkeServis(biljkeRepozitorijum, dogadjajiServis);
             // TODO: Dodati ostale servise 
 
             // Ako nema nijednog korisnika u sistemu, dodati dva nova
@@ -127,6 +130,7 @@ namespace Loger_Bloger
             OpcijeMeni meni = new OpcijeMeni(
                 autentifikacijaServis,
                 biljkeServis, // TODO: Dodati IBiljkeServis kada bude implementiran
+                dogadjajiServis,
                 prijavljen
             );
             meni.PrikaziGlavniMeni();

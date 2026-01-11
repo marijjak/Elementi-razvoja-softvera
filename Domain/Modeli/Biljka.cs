@@ -47,5 +47,13 @@ namespace Domain.Modeli
 
             JacinaArome = novaJacina;
         }
+
+        public void OznaciKaoUbranu()
+        {
+            if (Stanje != StanjeBiljke.Posadjena)
+                throw new InvalidOperationException("Biljka mora biti posađena da bi bila ubrana.");
+
+            Stanje = StanjeBiljke.Ubrana;
+        }
     }
 }

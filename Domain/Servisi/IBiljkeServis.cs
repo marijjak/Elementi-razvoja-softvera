@@ -10,6 +10,7 @@ namespace Domain.Servisi
     public interface IBiljkeServis
     {
         Biljka DodajBiljku(Biljka biljka);
+        bool OznaciBiljkuKaoUbranu(Guid id);
         void PromeniStanje(Guid biljkaId);
         IEnumerable<Biljka> SveBiljke();
         bool ZasadiNovuBiljku(string naziv, string latinski, string zemlja, double jacina);

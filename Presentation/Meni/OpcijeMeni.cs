@@ -8,15 +8,18 @@ namespace Presentation.Meni
     {
         private readonly IAutentifikacijaServis _authServis;
         private readonly IBiljkeServis _biljkeServis;
+        private readonly IDogadjajiServis _dogadjajiServis;
+
         private Korisnik _ulogovan;
 
         public OpcijeMeni(
             IAutentifikacijaServis authServis,
-            IBiljkeServis biljkeServis,
+            IBiljkeServis biljkeServis, IDogadjajiServis dogadjajiServis,
             Korisnik ulogovan)
         {
             _authServis = authServis;
             _biljkeServis = biljkeServis;
+            _dogadjajiServis = dogadjajiServis;
             _ulogovan = ulogovan;
         }
 
@@ -102,6 +105,8 @@ namespace Presentation.Meni
                 Console.WriteLine("1. Upravljanje biljkama");
                 Console.WriteLine("2. Pregled biljaka");
                 Console.WriteLine("3. Prilagodi jačinu mirisa biljke");
+                Console.WriteLine("4. Označi biljku kao ubranu");
+                Console.WriteLine("5. Pregled važnih događaja");
                 Console.WriteLine("0. Nazad");
                 Console.Write("Izbor: ");
 
@@ -119,6 +124,14 @@ namespace Presentation.Meni
                         break;
                     case "3":
                         PrilagodiMirisBiljke();
+                        break;
+
+                    case "4":
+                        OznaciBiljkuKaoUbranu();
+                        break;
+
+                    case "5":
+                        PregledDogadjaja();
                         break;
 
                     case "0":
@@ -234,6 +247,74 @@ namespace Presentation.Meni
             {
                 Console.WriteLine("Biljka nije pronađena.");
             }
+            Pauza("");
+        }
+
+        // ==================== OZNAČI BILJKU KAO UBRANU ====================
+        private void OznaciBiljkuKaoUbranu()
+        {
+            Console.Clear();
+            Console.WriteLine("\n Označavanje biljke kao ubrane. \n");
+
+            // Prikažemo biljke da korisnik vidi stanje
+            var biljke = _biljkeServis.SveBiljke();
+
+            if (biljke == null || !biljke.Any())
+            {
+                Pauza("Nema biljaka u sistemu.");
+                return;
+            }
+
+            foreach (var b in biljke)
+            {
+                Console.WriteLine($"ID: {b.Id} | Naziv: {b.OpstiNaziv} | Stanje: {b.Stanje}");
+            }
+
+            Console.Write("\nUnesite ID biljke koju želite da označite kao ubranu: ");
+            string unos = Console.ReadLine() ?? "";
+
+            if (!Guid.TryParse(unos, out Guid id))
+            {
+                Pauza("Neispravan ID.");
+                return;
+            }
+
+            try
+            {
+                bool uspeh = _biljkeServis.OznaciBiljkuKaoUbranu(id);
+
+                if (uspeh)
+                    Pauza("Biljka je uspešno označena kao ubrana.");
+                else
+                    Pauza("Biljka nije pronađena.");
+            }
+            catch (Exception ex)
+            {
+                Pauza($"Greška: {ex.Message}");
+            }
+        }
+
+        // ==================== PREGLED DOGAĐAJA ====================
+        private void PregledDogadjaja()
+        {
+            Console.Clear();
+            Console.WriteLine("\n===== VAŽNI DOGAĐAJI =====\n");
+
+            var dogadjaji = _dogadjajiServis.SviDogadjaji();
+
+            if (!dogadjaji.Any())
+            {
+                Pauza("Nema zabeleženih događaja.");
+                return;
+            }
+
+            foreach (var d in dogadjaji)
+            {
+                Console.WriteLine(
+                    $"{d.Vreme:dd.MM.yyyy HH:mm} | {d.Tip} | {d.Opis}"
+                );
+            }
+
             Pauza("");
         }
     }

@@ -13,10 +13,12 @@ namespace Services
     public class BiljkeServis : IBiljkeServis
     {
         private readonly IBiljkeRepozitorijum _repo;
+        private readonly IDogadjajiServis _dogadjajiServis;
 
-        public BiljkeServis(IBiljkeRepozitorijum repo)
+        public BiljkeServis(IBiljkeRepozitorijum repo, IDogadjajiServis dogadjajiServis)
         {
             _repo = repo;
+            _dogadjajiServis = dogadjajiServis;
         }
 
         public Biljka DodajBiljku(Biljka biljka)
@@ -59,7 +61,9 @@ namespace Services
 
              
                 _repo.Dodaj(novaBiljka);
-             
+
+                _dogadjajiServis.Zabelezi($"Zasađena nova biljka: {novaBiljka.OpstiNaziv} ({novaBiljka.LatinskiNaziv})", "Sadnja", novaBiljka.Id);
+
 
                 return true;
             }
@@ -73,9 +77,30 @@ namespace Services
             var biljka = _repo.NadjiPoId(id); // Pronalaženje biljke
             if (biljka == null) return false;
 
+            double stariMiris = biljka.JacinaArome;
+
+
             biljka.PromeniJacinuArome(procenat);
 
-            _repo.Dodaj(biljka); 
+            _repo.Dodaj(biljka);
+
+            _dogadjajiServis.Zabelezi($"Promenjena jačina arome za '{biljka.OpstiNaziv}' sa {stariMiris:F1} na {biljka.JacinaArome:F1}", "Izmena", biljka.Id);
+
+            return true;
+        }
+
+        public bool OznaciBiljkuKaoUbranu(Guid biljkaId)
+        {
+            var biljka = _repo.NadjiPoId(biljkaId);
+            if (biljka == null)
+                return false;
+
+            biljka.OznaciKaoUbranu();
+
+            _dogadjajiServis.Zabelezi($"Biljka '{biljka.OpstiNaziv}' je označena kao ubrana.", "Biljka", biljka.Id);
+
+            _repo.Dodaj(biljka);
+
             return true;
         }
 
