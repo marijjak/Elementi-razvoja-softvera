@@ -23,6 +23,8 @@ namespace Loger_Bloger
             IKorisniciRepozitorijum korisniciRepozitorijum = new KorisniciRepozitorijum(bazaPodataka);
             IBiljkeRepozitorijum biljkeRepozitorijum = new BiljkeRepozitorijum(bazaPodataka);
             IDogadjajiRepozitorijum dogadjajiRepozitorijum = new DogadjajiRepozitorijum(bazaPodataka);
+            IPerfumeRepository perfumeRepo = new PerfumeRepository(bazaPodataka);
+
 
             // TODO: Dodati ostale repozitorijume 
             biljkeRepozitorijum.ObrisiPrazne();

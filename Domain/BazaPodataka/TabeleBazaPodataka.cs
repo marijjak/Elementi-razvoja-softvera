@@ -8,6 +8,7 @@ namespace Domain.BazaPodataka
 
         public List<Biljka> Biljke { get; set; } =[];
 
+        public List<Parfem> Parfemi { get; set; } = [];
         public List<Dogadjaj> Dogadjaji { get; set; } = new();
 
 
