@@ -1,6 +1,8 @@
 ﻿using Domain.Enumeracije;
 using Domain.Modeli;
+using Domain.Repozitorijumi;
 using Domain.Servisi;
+using Services;
 
 namespace Presentation.Meni
 {
@@ -9,17 +11,22 @@ namespace Presentation.Meni
         private readonly IAutentifikacijaServis _authServis;
         private readonly IBiljkeServis _biljkeServis;
         private readonly IDogadjajiServis _dogadjajiServis;
+        private readonly IPreradaServis _preradaServis;
+        private readonly IPerfumeRepository _parfemRepo;
 
         private Korisnik _ulogovan;
 
         public OpcijeMeni(
             IAutentifikacijaServis authServis,
-            IBiljkeServis biljkeServis, IDogadjajiServis dogadjajiServis,
+            IBiljkeServis biljkeServis, IDogadjajiServis dogadjajiServis, IPreradaServis preradaServis,
+            IPerfumeRepository parfemRepo,
             Korisnik ulogovan)
         {
             _authServis = authServis;
             _biljkeServis = biljkeServis;
             _dogadjajiServis = dogadjajiServis;
+            _preradaServis = preradaServis;
+            _parfemRepo = parfemRepo;
             _ulogovan = ulogovan;
         }
 
@@ -108,6 +115,7 @@ namespace Presentation.Meni
                 Console.WriteLine("3. Prilagodi jačinu mirisa biljke");
                 Console.WriteLine("4. Označi biljku kao ubranu");
                 Console.WriteLine("5. Pregled važnih događaja");
+                Console.WriteLine("6. Prerada biljaka u parfeme");
                 Console.WriteLine("0. Nazad");
                 Console.Write("Izbor: ");
 
@@ -133,6 +141,10 @@ namespace Presentation.Meni
 
                     case "5":
                         PregledDogadjaja();
+                        break;
+
+                    case "6":
+                        PreradaMeni();
                         break;
 
                     case "0":
@@ -318,5 +330,85 @@ namespace Presentation.Meni
 
             Pauza("");
         }
+
+        private void PrikaziSveParfeme()
+        {
+            Console.Clear();
+            Console.WriteLine("\n===== KATALOG PARFEMA =====");
+
+            var parfemi = _parfemRepo.Svi();
+
+            if (!parfemi.Any())
+            {
+                Pauza("Nema parfema na stanju.");
+                return;
+            }
+
+            foreach (var p in parfemi)
+            {
+                Console.WriteLine($"{p.Naziv,-12} | {p.TipParfema,-10} | {p.ZapreminaBociceMl}ml | Na stanju: {p.KolicinaNaStanju}");
+            }
+
+            Pauza("");
+        }
+        private void KreirajParfemMeni()
+        {
+            Console.Clear();
+            Console.WriteLine("\n===== NOVI PARFEM =====");
+
+            Console.Write("Naziv parfema: ");
+            string naziv = Console.ReadLine() ?? "";
+
+            Console.Write("Tip (Eau de Parfum / Eau de Toilette): ");
+            string tip = Console.ReadLine() ?? "";
+
+            Console.Write("Broj bočica: ");
+            int br = int.Parse(Console.ReadLine() ?? "0");
+
+            Console.Write("Zapremina bočice (150 / 250): ");
+            int zap = int.Parse(Console.ReadLine() ?? "0");
+
+            try
+            {
+                var parfem = _preradaServis.NapraviParfem(naziv, br, zap, tip);
+                Pauza($"Parfem uspešno napravljen! Serijski broj: {parfem.SerijskiBroj}");
+            }
+            catch (Exception ex)
+            {
+                Pauza("Greška: " + ex.Message);
+            }
+
+        }
+
+        private void PreradaMeni()
+        {
+            bool nazad = false;
+
+            while (!nazad)
+            {
+                Console.Clear();
+                Console.WriteLine("\n===== PRERADA PARFEMA =====");
+                Console.WriteLine("1. Pregled svih parfema (katalog)");
+                Console.WriteLine("2. Napravi novi parfem");
+                Console.WriteLine("0. Nazad");
+                Console.Write("Izbor: ");
+
+                string izbor = Console.ReadLine() ?? "";
+
+                switch (izbor)
+                {
+                    case "1":
+                        PrikaziSveParfeme();
+                        break;
+                    case "2":
+                        KreirajParfemMeni();
+                        break;
+                    case "0":
+                        nazad = true;
+                        break;
+                }
+            }
+        }
+
     }
 }

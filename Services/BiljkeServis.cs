@@ -103,6 +103,16 @@ namespace Services
 
             return true;
         }
+        public void PromeniJacinuUljaProcentualno(Guid id, double procenat)
+        {
+            var biljka = _repo.Sve().FirstOrDefault(b => b.Id == id);
+            if (biljka != null)
+            {
+                // Ако је проценат 0.65, јачина постаје 65% тренутне вредности
+                biljka.JacinaArome = biljka.JacinaArome * procenat;
+                _repo.Azuriraj(biljka);
+            }
+        }
 
     }
 }

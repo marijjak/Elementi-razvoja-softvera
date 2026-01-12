@@ -26,6 +26,8 @@ namespace Loger_Bloger
             IPerfumeRepository perfumeRepo = new PerfumeRepository(bazaPodataka);
 
 
+
+
             // TODO: Dodati ostale repozitorijume 
             biljkeRepozitorijum.ObrisiPrazne();
 
@@ -33,6 +35,9 @@ namespace Loger_Bloger
             IAutentifikacijaServis autentifikacijaServis = new AutentifikacioniServis(korisniciRepozitorijum);
             IDogadjajiServis dogadjajiServis = new DogadjajiServis(dogadjajiRepozitorijum);
             IBiljkeServis biljkeServis = new BiljkeServis(biljkeRepozitorijum, dogadjajiServis);
+            IPreradaServis preradaServis = new PreradaServis(biljkeServis, perfumeRepo);
+
+
             // TODO: Dodati ostale servise 
 
             // Ako nema nijednog korisnika u sistemu, dodati dva nova
@@ -131,8 +136,10 @@ namespace Loger_Bloger
             // Glavni meni aplikacije
             OpcijeMeni meni = new OpcijeMeni(
                 autentifikacijaServis,
-                biljkeServis, // TODO: Dodati IBiljkeServis kada bude implementiran
+                biljkeServis, 
                 dogadjajiServis,
+                preradaServis,
+                perfumeRepo,
                 prijavljen
             );
             meni.PrikaziGlavniMeni();

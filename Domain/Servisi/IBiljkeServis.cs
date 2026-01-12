@@ -14,5 +14,6 @@ namespace Domain.Servisi
         void PromeniStanje(Guid biljkaId);
         IEnumerable<Biljka> SveBiljke();
         bool ZasadiNovuBiljku(string naziv, string latinski, string zemlja, double jacina);
+        void PromeniJacinuUljaProcentualno(Guid id, double procenat);
     }
 }
