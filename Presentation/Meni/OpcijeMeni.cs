@@ -23,10 +23,11 @@ namespace Presentation.Meni
             _ulogovan = ulogovan;
         }
 
-        // ==================== GLAVNI MENI ====================
+        // ==================== GLAVNI MENI  ====================
         public void PrikaziGlavniMeni()
         {
             bool kraj = false;
+
 
             while (!kraj)
             {
