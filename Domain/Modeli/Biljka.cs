@@ -21,7 +21,7 @@ namespace Domain.Modeli
         public Biljka(
             string opstiNaziv,
             string latinskiNaziv,
-            int jacinaArome,
+            double jacinaArome,
             string zemljaPorekla)
         {
             Id= Guid.NewGuid();

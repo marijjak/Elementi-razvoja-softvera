@@ -23,7 +23,7 @@ namespace Services
 
         public Biljka DodajBiljku(Biljka biljka)
         {
-            if (biljka.JacinaArome < 1 || biljka.JacinaArome > 5)
+            if (biljka.JacinaArome <1 || biljka.JacinaArome > 5)
                 throw new Exception("Jačina arome mora biti između 1 i 5.");
 
             return _repo.Dodaj(biljka);
@@ -54,7 +54,7 @@ namespace Services
             {
                 // Kreiramo novi model biljke
              
-                Biljka novaBiljka = new Biljka(naziv, latinski,(int)jacina, zemlja);
+                Biljka novaBiljka = new Biljka(naziv, latinski,jacina, zemlja);
 
                 // Postavljamo početno stanje prema zahtevu zadatka
                 novaBiljka.PromeniStanje(StanjeBiljke.Posadjena);
