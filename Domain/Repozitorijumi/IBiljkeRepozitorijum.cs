@@ -12,5 +12,6 @@ using System.Text;
         Biljka NadjiPoId(Guid id);
         IEnumerable<Biljka> Sve();
         void ObrisiPrazne();
+        void Azuriraj(Biljka biljka);
     }
 }

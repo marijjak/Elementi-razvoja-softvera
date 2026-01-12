@@ -62,5 +62,23 @@ namespace Database.Repozitorijumi
 
             _baza.SacuvajPromene();
         }
+        public void Azuriraj(Biljka biljka)
+        {
+            
+            var postojeca = _baza.Tabele.Biljke.FirstOrDefault(b => b.Id == biljka.Id);
+
+            if (postojeca != null)
+            {
+             
+                postojeca.Stanje = biljka.Stanje;
+                postojeca.JacinaArome = biljka.JacinaArome;
+                postojeca.OpstiNaziv = biljka.OpstiNaziv;
+                postojeca.LatinskiNaziv = biljka.LatinskiNaziv;
+                postojeca.ZemljaPorekla = biljka.ZemljaPorekla;
+
+               
+                _baza.SacuvajPromene();
+            }
+        }
     }
 }
