@@ -23,7 +23,7 @@ namespace Services
 
         public Biljka DodajBiljku(Biljka biljka)
         {
-            if (biljka.JacinaArome <1 || biljka.JacinaArome > 5)
+            if (biljka.JacinaArome < 1 || biljka.JacinaArome > 5)
                 throw new Exception("Jačina arome mora biti između 1 i 5.");
 
             return _repo.Dodaj(biljka);
@@ -53,22 +53,23 @@ namespace Services
             try
             {
                 // Kreiramo novi model biljke
-             
-                Biljka novaBiljka = new Biljka(naziv, latinski,jacina, zemlja);
+
+                Biljka novaBiljka = new Biljka(naziv, latinski, jacina, zemlja);
 
                 // Postavljamo početno stanje prema zahtevu zadatka
                 novaBiljka.PromeniStanje(StanjeBiljke.Posadjena);
 
-             
+
                 _repo.Dodaj(novaBiljka);
 
-                _dogadjajiServis.Zabelezi($"Zasađena nova biljka: {novaBiljka.OpstiNaziv} ({novaBiljka.LatinskiNaziv})", "Sadnja", novaBiljka.Id);
+                _dogadjajiServis.Zabelezi($"Zasađena nova biljka: {novaBiljka.OpstiNaziv} ({novaBiljka.LatinskiNaziv})", TipEvidencije.INFO, novaBiljka.Id);
 
 
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _dogadjajiServis.Zabelezi($"Greška pri sadnji biljke {naziv}: {ex.Message}", TipEvidencije.ERROR);
                 return false;
             }
         }
@@ -84,7 +85,7 @@ namespace Services
 
             _repo.Dodaj(biljka);
 
-            _dogadjajiServis.Zabelezi($"Promenjena jačina arome za '{biljka.OpstiNaziv}' sa {stariMiris:F1} na {biljka.JacinaArome:F1}", "Izmena", biljka.Id);
+            _dogadjajiServis.Zabelezi($"Promenjena jačina arome za '{biljka.OpstiNaziv}' sa {stariMiris:F1} na {biljka.JacinaArome:F1}", TipEvidencije.INFO, biljka.Id);
 
             return true;
         }
@@ -97,22 +98,46 @@ namespace Services
 
             biljka.OznaciKaoUbranu();
 
-            _dogadjajiServis.Zabelezi($"Biljka '{biljka.OpstiNaziv}' je označena kao ubrana.", "Biljka", biljka.Id);
+            _dogadjajiServis.Zabelezi($"Biljka '{biljka.OpstiNaziv}' je označena kao ubrana.", TipEvidencije.INFO, biljka.Id);
 
             _repo.Dodaj(biljka);
 
             return true;
         }
-        public void PromeniJacinuUljaProcentualno(Guid id, double procenat)
+        public void PromeniJacinuUljaProcentualno(string unos, double procenat)
         {
-            var biljka = _repo.Sve().FirstOrDefault(b => b.Id == id);
+            var biljka = _repo.Sve().FirstOrDefault(b =>
+        b.Id.ToString() == unos ||
+        b.OpstiNaziv.Equals(unos, StringComparison.OrdinalIgnoreCase));
             if (biljka != null)
             {
-                // Ако је проценат 0.65, јачина постаје 65% тренутне вредности
-                biljka.JacinaArome = biljka.JacinaArome * procenat;
-                _repo.Azuriraj(biljka);
-            }
-        }
 
+                try
+                {
+                    double staraVrednost = biljka.JacinaArome;
+
+                    // Ако је проценат 0.65, јачина постаје 65% тренутне вредности
+                    biljka.JacinaArome = biljka.JacinaArome * procenat;
+                    if (biljka.JacinaArome > 5.0) biljka.JacinaArome = 5.0;
+                    _repo.Azuriraj(biljka);
+
+                    double procenatPrikaz = procenat * 100;
+
+                    _dogadjajiServis.Zabelezi($"Procentualna promena jačine ulja za biljku '{biljka.OpstiNaziv}' sa {staraVrednost:F1} na {biljka.JacinaArome:F1} (Primenjeno {procenatPrikaz}%).", TipEvidencije.INFO, biljka.Id);
+                }
+                catch (Exception ex)
+                {
+                    // Ako nešto pođe po zlu, beležimo ERROR
+                    _dogadjajiServis.Zabelezi($"Greška pri procentualnoj izmeni: {ex.Message}", TipEvidencije.ERROR, biljka.Id);
+                }
+
+            }
+            else
+            {
+                // Ako ne nađe po ID-u, neka zapiše grešku - bar ćemo imati fajl!
+                _dogadjajiServis.Zabelezi($"BILJKA NIJE PRONAĐENA ZA ID: {unos}", TipEvidencije.ERROR);
+            }
+
+        }
     }
 }

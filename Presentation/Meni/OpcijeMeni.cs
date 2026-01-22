@@ -251,8 +251,7 @@ namespace Presentation.Meni
                 Console.Write("Unesite procenat promene (npr. 20 za povećanje, -10 za smanjenje): ");
                 if (double.TryParse(Console.ReadLine(), out double procenat))
                 {
-                    biljka.PromeniJacinuArome(procenat);
-                    _biljkeServis.DodajBiljku(biljka); 
+                    _biljkeServis.PromeniJacinuUljaProcentualno(naziv, procenat);
                     Console.WriteLine($"\nNova jačina mirisa za {biljka.OpstiNaziv} je: {biljka.JacinaArome:F1}");
                 }
             }

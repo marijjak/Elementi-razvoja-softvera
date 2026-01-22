@@ -76,7 +76,7 @@ namespace Services
                 var balansnaBiljka = _biljkeServis.SveBiljke().Last();
 
                 //smanjiti jačinu... na 65% (procenat odstupanja) od vrednosti koju ima
-                _biljkeServis.PromeniJacinuUljaProcentualno(balansnaBiljka.Id, procenatOdstupanja);
+                _biljkeServis.PromeniJacinuUljaProcentualno(balansnaBiljka.Id.ToString(), procenatOdstupanja);
             }
 
             // 5. Kreiranje parfema

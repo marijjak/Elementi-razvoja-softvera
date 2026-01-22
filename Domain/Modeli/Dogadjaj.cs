@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Enumeracije;
 
 namespace Domain.Modeli
 {
@@ -11,7 +12,7 @@ namespace Domain.Modeli
         public Guid Id { get; set; }
         public DateTime Vreme { get; set; }
         public string Opis { get; set; } = string.Empty;
-        public string Tip { get; set; } = string.Empty;
+        public TipEvidencije Tip { get; set; }
         public Guid? EntitetId { get; set; } // npr. ID biljke, parfema
 
         public Dogadjaj()
@@ -19,7 +20,7 @@ namespace Domain.Modeli
             // za JSON
         }
 
-        public Dogadjaj(string opis, string tip, Guid? entitetId = null)
+        public Dogadjaj(string opis, TipEvidencije tip, Guid? entitetId = null)
         {
             Id = Guid.NewGuid();
             Vreme = DateTime.Now;
