@@ -13,6 +13,7 @@ namespace Presentation.Meni
         private readonly IDogadjajiServis _dogadjajiServis;
         private readonly IPreradaServis _preradaServis;
         private readonly IPerfumeRepository _parfemRepo;
+        private readonly IAmbalazaServis _ambalazaServis;
 
         private Korisnik _ulogovan;
 
@@ -20,6 +21,7 @@ namespace Presentation.Meni
             IAutentifikacijaServis authServis,
             IBiljkeServis biljkeServis, IDogadjajiServis dogadjajiServis, IPreradaServis preradaServis,
             IPerfumeRepository parfemRepo,
+            IAmbalazaServis ambalazaServis,
             Korisnik ulogovan)
         {
             _authServis = authServis;
@@ -27,6 +29,7 @@ namespace Presentation.Meni
             _dogadjajiServis = dogadjajiServis;
             _preradaServis = preradaServis;
             _parfemRepo = parfemRepo;
+            _ambalazaServis = ambalazaServis;
             _ulogovan = ulogovan;
         }
 
@@ -116,6 +119,7 @@ namespace Presentation.Meni
                 Console.WriteLine("4. Označi biljku kao ubranu");
                 Console.WriteLine("5. Pregled važnih događaja");
                 Console.WriteLine("6. Prerada biljaka u parfeme");
+                Console.WriteLine("7. Upravljanje ambalažom");
                 Console.WriteLine("0. Nazad");
                 Console.Write("Izbor: ");
 
@@ -145,6 +149,9 @@ namespace Presentation.Meni
 
                     case "6":
                         PreradaMeni();
+                        break;
+                    case "7":
+                        UpravljanjeAmbalazom();
                         break;
 
                     case "0":
@@ -409,5 +416,112 @@ namespace Presentation.Meni
             }
         }
 
+        private void UpravljanjeAmbalazom()
+        {
+            bool nazad = false;
+
+            while (!nazad)
+            {
+                Console.Clear();
+                Console.WriteLine("\n===== UPRAVLJANJE AMBALAŽOM =====");
+                Console.WriteLine("1. Kreiraj ambalažu");
+                Console.WriteLine("2. Pregled ambalaža");
+                Console.WriteLine("0. Nazad");
+                Console.Write("Izbor: ");
+
+                string izbor = Console.ReadLine() ?? "";
+
+                switch (izbor.Trim())
+                {
+                    case "1":
+                        KreirajAmbalazu();
+                        break;
+                    case "2":
+                        PregledAmbalaza();
+                        break;
+                    case "0":
+                        nazad = true;
+                        break;
+                    default:
+                        Pauza("Nevalidna opcija.");
+                        break;
+                }
+            }
+        }
+
+        private void KreirajAmbalazu()
+        {
+            Console.Clear();
+            Console.WriteLine("\n===== KREIRANJE AMBALAŽE =====");
+
+            Console.Write("Naziv ambalaže: ");
+            string naziv = Console.ReadLine() ?? "";
+
+            Console.Write("Adresa pošiljaoca: ");
+            string adresa = Console.ReadLine() ?? "";
+
+            Guid skladisteId;
+            while (true)
+            {
+                Console.Write("ID skladišta (GUID): ");
+                string unosSkladiste = Console.ReadLine() ?? "";
+                if (Guid.TryParse(unosSkladiste, out skladisteId))
+                {
+                    break;
+                }
+
+                Console.WriteLine("Neispravan GUID format za skladište.");
+            }
+
+            Console.Write("Unesite ID-eve parfema (zarezom odvojeno) ili ostavite prazno: ");
+            string parfemiUnos = Console.ReadLine() ?? "";
+            List<Guid> parfemIds = new List<Guid>();
+
+            if (!string.IsNullOrWhiteSpace(parfemiUnos))
+            {
+                var delovi = parfemiUnos.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                foreach (var deo in delovi)
+                {
+                    if (Guid.TryParse(deo, out Guid parfemId))
+                    {
+                        parfemIds.Add(parfemId);
+                    }
+                }
+            }
+
+            try
+            {
+                var ambalaza = _ambalazaServis.KreirajAmbalazu(naziv, adresa, skladisteId, parfemIds);
+                Pauza($"Ambalaža kreirana! ID: {ambalaza.Id}");
+            }
+            catch (Exception ex)
+            {
+                Pauza($"Greška: {ex.Message}");
+            }
+        }
+
+        private void PregledAmbalaza()
+        {
+            Console.Clear();
+            Console.WriteLine("\n===== PREGLED AMBALAŽA =====");
+
+            var ambalaze = _ambalazaServis.SveAmbalaze().ToList();
+
+            if (!ambalaze.Any())
+            {
+                Pauza("Trenutno nema kreiranih ambalaža.");
+                return;
+            }
+
+            foreach (var ambalaza in ambalaze)
+            {
+                Console.WriteLine($"ID: {ambalaza.Id} | Naziv: {ambalaza.Naziv} | Adresa: {ambalaza.AdresaPosiljaoca} | " +
+                                  $"Skladište: {ambalaza.SkladisteId} | Status: {ambalaza.Status} | Parfemi: {ambalaza.ParfemIds.Count}");
+            }
+
+            Pauza("");
+        }
+
     }
+
 }

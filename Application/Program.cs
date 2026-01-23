@@ -24,6 +24,7 @@ namespace Loger_Bloger
             IBiljkeRepozitorijum biljkeRepozitorijum = new BiljkeRepozitorijum(bazaPodataka);
             IDogadjajiRepozitorijum dogadjajiRepozitorijum = new DogadjajiRepozitorijum(bazaPodataka);
             IPerfumeRepository perfumeRepo = new PerfumeRepository(bazaPodataka);
+            IAmbalazaRepozitorijum ambalazaRepozitorijum = new AmbalazaRepozitorijum(bazaPodataka);
 
 
 
@@ -36,7 +37,7 @@ namespace Loger_Bloger
             IDogadjajiServis dogadjajiServis = new DogadjajiServis(dogadjajiRepozitorijum);
             IBiljkeServis biljkeServis = new BiljkeServis(biljkeRepozitorijum, dogadjajiServis);
             IPreradaServis preradaServis = new PreradaServis(biljkeServis, perfumeRepo);
-
+            IAmbalazaServis ambalazaServis = new AmbalazaServis(ambalazaRepozitorijum, dogadjajiServis);
 
             // TODO: Dodati ostale servise 
 
@@ -140,6 +141,7 @@ namespace Loger_Bloger
                 dogadjajiServis,
                 preradaServis,
                 perfumeRepo,
+                ambalazaServis,
                 prijavljen
             );
             meni.PrikaziGlavniMeni();

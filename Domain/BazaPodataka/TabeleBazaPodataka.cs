@@ -11,6 +11,7 @@ namespace Domain.BazaPodataka
         public List<Parfem> Parfemi { get; set; } = [];
         public List<Dogadjaj> Dogadjaji { get; set; } = new();
 
+        public List<Ambalaza> Ambalaze { get; set; } = [];
 
         //  Add other database tables as needed
 
