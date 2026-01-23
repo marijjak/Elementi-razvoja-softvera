@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Domain.Enumeracije;
+﻿using Domain.Enumeracije;
 using Domain.Modeli;
 using Domain.Repozitorijumi;
 using Domain.Servisi;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Services
 {
@@ -14,11 +12,16 @@ namespace Services
     {
         private readonly IAmbalazaRepozitorijum _repo;
         private readonly IDogadjajiServis _dogadjajiServis;
+        private readonly IPerfumeRepository _parfemRepo;
 
-        public AmbalazaServis(IAmbalazaRepozitorijum repo, IDogadjajiServis dogadjajiServis)
+        public AmbalazaServis(
+            IAmbalazaRepozitorijum repo,
+            IDogadjajiServis dogadjajiServis,
+            IPerfumeRepository parfemRepo)
         {
             _repo = repo;
             _dogadjajiServis = dogadjajiServis;
+            _parfemRepo = parfemRepo;
         }
 
         public Ambalaza KreirajAmbalazu(string naziv, string adresaPosiljaoca, Guid skladisteId, IEnumerable<Guid> parfemIds)
@@ -33,7 +36,7 @@ namespace Services
                 Naziv = string.IsNullOrWhiteSpace(naziv) ? "Ambalaža" : naziv,
                 AdresaPosiljaoca = adresaPosiljaoca,
                 SkladisteId = skladisteId,
-                ParfemIds = parfemIds?.ToList() ?? [],
+                ParfemIds = parfemIds?.ToList() ?? new List<Guid>(),
                 Status = StatusAmbalaze.Spakovana
             };
 
@@ -50,6 +53,60 @@ namespace Services
         public IEnumerable<Ambalaza> SveAmbalaze()
         {
             return _repo.Sve();
+        }
+
+        public Ambalaza DodajParfemeUAmbalazu(Guid ambalazaId, IEnumerable<Guid> parfemIds)
+        {
+            var ambalaza = _repo.NadjiPoId(ambalazaId);
+            if (ambalaza == null)
+            {
+                throw new InvalidOperationException("Ambalaža nije pronađena.");
+            }
+
+            var parfemiZaDodavanje = parfemIds
+                .Where(id => id != Guid.Empty)
+                .Distinct()
+                .ToList();
+
+            if (!parfemiZaDodavanje.Any())
+            {
+                throw new InvalidOperationException("Niste uneli nijedan validan ID parfema.");
+            }
+
+            var postojeciParfemi = _parfemRepo.Svi().Select(p => p.Id).ToHashSet();
+            var nepostojeci = parfemiZaDodavanje.Where(id => !postojeciParfemi.Contains(id)).ToList();
+            if (nepostojeci.Any())
+            {
+                throw new InvalidOperationException("Jedan ili više parfema ne postoji u sistemu.");
+            }
+
+            var zauzetiParfemi = _repo.Sve()
+                .Where(a => a.Id != ambalazaId)
+                .SelectMany(a => a.ParfemIds)
+                .ToHashSet();
+
+            var duplikati = parfemiZaDodavanje.Where(id => zauzetiParfemi.Contains(id)).ToList();
+            if (duplikati.Any())
+            {
+                throw new InvalidOperationException("Parfem ne može biti u više ambalaža istovremeno.");
+            }
+
+            foreach (var parfemId in parfemiZaDodavanje)
+            {
+                if (!ambalaza.ParfemIds.Contains(parfemId))
+                {
+                    ambalaza.ParfemIds.Add(parfemId);
+                }
+            }
+
+            _repo.Azuriraj(ambalaza);
+
+            _dogadjajiServis.Zabelezi(
+                $"Dodato {parfemiZaDodavanje.Count} parfema u ambalažu '{ambalaza.Naziv}'.",
+                TipEvidencije.INFO,
+                ambalaza.Id);
+
+            return ambalaza;
         }
     }
 }

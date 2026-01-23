@@ -9,7 +9,7 @@ using System.Text;
     public interface IBiljkeRepozitorijum
     {
         Biljka Dodaj(Biljka biljka);
-        Biljka NadjiPoId(Guid id);
+        Biljka? NadjiPoId(Guid id);
         IEnumerable<Biljka> Sve();
         void ObrisiPrazne();
         void Azuriraj(Biljka biljka);

@@ -12,5 +12,6 @@ namespace Domain.Servisi
     {
         Ambalaza KreirajAmbalazu(string naziv, string adresaPosiljaoca, Guid skladisteId, IEnumerable<Guid> parfemIds);
         IEnumerable<Ambalaza> SveAmbalaze();
+        Ambalaza DodajParfemeUAmbalazu(Guid ambalazaId, IEnumerable<Guid> parfemIds);
     }
 }

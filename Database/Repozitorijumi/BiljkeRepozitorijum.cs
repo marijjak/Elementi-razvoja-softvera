@@ -40,7 +40,7 @@ namespace Database.Repozitorijumi
             return biljka;
         }
 
-        public Biljka NadjiPoId(Guid id)
+        public Biljka? NadjiPoId(Guid id)
         {
             return _baza.Tabele.Biljke
                 .FirstOrDefault(b => b.Id == id);

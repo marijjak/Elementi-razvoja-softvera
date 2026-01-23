@@ -13,5 +13,7 @@ namespace Domain.Repozitorijumi
         Ambalaza Dodaj(Ambalaza ambalaza);
         Ambalaza? NadjiPoId(Guid id);
         IEnumerable<Ambalaza> Sve();
+
+        void Azuriraj(Ambalaza ambalaza);
     }
 }

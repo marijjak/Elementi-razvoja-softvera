@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Domain.BazaPodataka;
+﻿using Domain.BazaPodataka;
 using Domain.Modeli;
 using Domain.Repozitorijumi;
-
 
 namespace Database.Repozitorijumi
 {
@@ -34,6 +28,22 @@ namespace Database.Repozitorijumi
         public IEnumerable<Ambalaza> Sve()
         {
             return _baza.Tabele.Ambalaze;
+        }
+
+        public void Azuriraj(Ambalaza ambalaza)
+        {
+            var postojeca = _baza.Tabele.Ambalaze.FirstOrDefault(a => a.Id == ambalaza.Id);
+
+            if (postojeca != null)
+            {
+                postojeca.Naziv = ambalaza.Naziv;
+                postojeca.AdresaPosiljaoca = ambalaza.AdresaPosiljaoca;
+                postojeca.SkladisteId = ambalaza.SkladisteId;
+                postojeca.ParfemIds = ambalaza.ParfemIds;
+                postojeca.Status = ambalaza.Status;
+
+                _baza.SacuvajPromene();
+            }
         }
     }
 }

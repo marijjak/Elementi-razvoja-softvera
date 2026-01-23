@@ -37,7 +37,7 @@ namespace Loger_Bloger
             IDogadjajiServis dogadjajiServis = new DogadjajiServis(dogadjajiRepozitorijum);
             IBiljkeServis biljkeServis = new BiljkeServis(biljkeRepozitorijum, dogadjajiServis);
             IPreradaServis preradaServis = new PreradaServis(biljkeServis, perfumeRepo);
-            IAmbalazaServis ambalazaServis = new AmbalazaServis(ambalazaRepozitorijum, dogadjajiServis);
+            IAmbalazaServis ambalazaServis = new AmbalazaServis(ambalazaRepozitorijum, dogadjajiServis, perfumeRepo);
 
             // TODO: Dodati ostale servise 
 
