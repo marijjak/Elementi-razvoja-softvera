@@ -8,31 +8,44 @@ using Domain.Modeli;
 
 namespace Domain.PomocneMetode 
 {
-    public class BiljkaPomocne : Biljka
-
+    public static class BiljkaPomocne
     {
-        public void PromeniStanje(StanjeBiljke novoStanje)
+        public static bool PromeniStanje(Biljka biljka, StanjeBiljke novoStanje)
         {
-            Stanje = novoStanje;
-        }
-        public void PromeniJacinuArome(double procenat)
-        {
-            // Izračunavanje nove jačine
-            double novaJacina = JacinaArome * (1 + procenat / 100);
+            if (biljka == null)
+            {
+                return false;
+            }
 
-            // Ograničavanje na opseg 1.0 - 5.0
+            biljka.Stanje = novoStanje;
+            return true;
+        }
+
+        public static bool PromeniJacinuArome(Biljka biljka, double procenat)
+        {
+            if (biljka == null)
+            {
+                return false;
+            }
+
+            double novaJacina = biljka.JacinaArome * (1 + procenat / 100);
+
             if (novaJacina < 1.0) novaJacina = 1.0;
             if (novaJacina > 5.0) novaJacina = 5.0;
 
-            JacinaArome = novaJacina;
+            biljka.JacinaArome = novaJacina;
+            return true;
         }
 
-        public void OznaciKaoUbranu()
+        public static bool OznaciKaoUbranu(Biljka biljka)
         {
-            if (Stanje != StanjeBiljke.Posadjena)
-                throw new InvalidOperationException("Biljka mora biti posađena da bi bila ubrana.");
+            if (biljka == null || biljka.Stanje != StanjeBiljke.Posadjena)
+            {
+                return false;
+            }
 
-            Stanje = StanjeBiljke.Ubrana;
+            biljka.Stanje = StanjeBiljke.Ubrana;
+            return true;
         }
     }
 }

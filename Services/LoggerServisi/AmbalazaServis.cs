@@ -42,10 +42,13 @@ namespace Services
 
             _repo.Dodaj(ambalaza);
 
-            _dogadjajiServis.Zabelezi(
-                $"Kreirana ambalaža '{ambalaza.Naziv}' za skladište {ambalaza.SkladisteId}.",
+            if (!_dogadjajiServis.Zabelezi(
+             $"Kreirana ambalaža '{ambalaza.Naziv}' za skladište {ambalaza.SkladisteId}.",
                 TipEvidencije.INFO,
-                ambalaza.Id);
+                        ambalaza.Id))
+            {
+                throw new InvalidOperationException("Neuspešno beleženje događaja za ambalažu.");
+            }
 
             return ambalaza;
         }
@@ -99,12 +102,19 @@ namespace Services
                 }
             }
 
-            _repo.Azuriraj(ambalaza);
+            if (!_repo.Azuriraj(ambalaza))
+            {
+                throw new InvalidOperationException("Neuspešno ažuriranje ambalaže.");
+            }
 
-            _dogadjajiServis.Zabelezi(
+
+            if (!_dogadjajiServis.Zabelezi(
                 $"Dodato {parfemiZaDodavanje.Count} parfema u ambalažu '{ambalaza.Naziv}'.",
                 TipEvidencije.INFO,
-                ambalaza.Id);
+                ambalaza.Id))
+            {
+                throw new InvalidOperationException("Neuspešno beleženje događaja za ambalažu.");
+            }
 
             return ambalaza;
         }

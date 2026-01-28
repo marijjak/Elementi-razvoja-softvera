@@ -10,7 +10,7 @@ namespace Domain.Servisi
 {
     public interface IDogadjajiServis
     {
-        void Zabelezi(string opis, TipEvidencije tip, Guid? entitetId = null);
+        bool Zabelezi(string opis, TipEvidencije tip, Guid? entitetId = null);
         IEnumerable<Dogadjaj> SviDogadjaji();
     }
 }

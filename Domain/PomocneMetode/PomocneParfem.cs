@@ -5,16 +5,23 @@ using System.Text;
 using System.Threading.Tasks;
 using Domain.Modeli;
 
-namespace Domain.PomocneMetode 
+namespace Domain.PomocneMetode
 {
-    public class PomocneParfem : Parfem
-    {
-        public void GenerisiSerijskiBroj()
+    
+        public static class PomocneParfem
         {
-            SerijskiBroj = $"PP-2025-{Id.ToString().Substring(0, 8).ToUpper()}";
-           // return true;
+            public static bool GenerisiSerijskiBroj(Parfem parfem)
+            {
+                if (parfem == null)
+                {
+                    return false;
+                }
+
+                parfem.SerijskiBroj = $"PP-2025-{parfem.Id.ToString().Substring(0, 8).ToUpper()}";
+                return true;
+            }
+
+
         }
-
-
-    }
+    
 }

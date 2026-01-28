@@ -19,12 +19,19 @@ namespace Database.Repozitorijumi
             
         }
 
-        public void Dodaj(Dogadjaj dogadjaj)
+        public bool Dodaj(Dogadjaj dogadjaj)
         {
-            
-            string linija = $"[{dogadjaj.Tip}] {dogadjaj.Vreme:dd.MM.yyyy HH:mm:ss} : {dogadjaj.Opis}";
+            try
+            {
+                string linija = $"[{dogadjaj.Tip}] {dogadjaj.Vreme:dd.MM.yyyy HH:mm:ss} : {dogadjaj.Opis}";
 
-            File.AppendAllText(_putanjaDoFajla, linija + Environment.NewLine);
+                File.AppendAllText(_putanjaDoFajla, linija + Environment.NewLine);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public IEnumerable<Dogadjaj> Sve()

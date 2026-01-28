@@ -32,9 +32,11 @@ namespace Tests.Services
             var opis = "Testna poruka";
             var tip = TipEvidencije.INFO;
             var entitetId = Guid.NewGuid();
+            _mockRepo.Setup(r => r.Dodaj(It.IsAny<Dogadjaj>())).Returns(true);
 
             // Act
-            _servis.Zabelezi(opis, tip, entitetId);
+            var rezultat = _servis.Zabelezi(opis, tip, entitetId);
+            Assert.That(rezultat, Is.True);
 
             // Assert
             // Proveravamo da li je repozitorijum primio poziv za dodavanje

@@ -50,34 +50,49 @@ namespace Database.Repozitorijumi
         {
             return _baza.Tabele.Biljke;
         }
-        public void ObrisiPrazne()
+        public bool ObrisiPrazne()
         {
-            // Pronalazi sve biljke koje nemaju naziv (one koje prave problem)
-            var zaBrisanje = _baza.Tabele.Biljke.Where(b => string.IsNullOrEmpty(b.OpstiNaziv)).ToList();
-
-            foreach (var b in zaBrisanje)
+            try
             {
-                _baza.Tabele.Biljke.Remove(b);
+                // Pronalazi sve biljke koje nemaju naziv (one koje prave problem)
+                var zaBrisanje = _baza.Tabele.Biljke.Where(b => string.IsNullOrEmpty(b.OpstiNaziv)).ToList();
+
+                foreach (var b in zaBrisanje)
+                {
+                    _baza.Tabele.Biljke.Remove(b);
+                }
+
+                _baza.SacuvajPromene();
+                return true;
             }
-
-            _baza.SacuvajPromene();
-        }
-        public void Azuriraj(Biljka biljka)
-        {
-            
-            var postojeca = _baza.Tabele.Biljke.FirstOrDefault(b => b.Id == biljka.Id);
-
-            if (postojeca != null)
+            catch
             {
-             
+                return false;
+            }
+        }
+        public bool Azuriraj(Biljka biljka)
+        {
+            try
+            {
+                var postojeca = _baza.Tabele.Biljke.FirstOrDefault(b => b.Id == biljka.Id);
+
+                if (postojeca == null)
+                {
+                    return false;
+                }
+
                 postojeca.Stanje = biljka.Stanje;
                 postojeca.JacinaArome = biljka.JacinaArome;
                 postojeca.OpstiNaziv = biljka.OpstiNaziv;
                 postojeca.LatinskiNaziv = biljka.LatinskiNaziv;
                 postojeca.ZemljaPorekla = biljka.ZemljaPorekla;
 
-               
                 _baza.SacuvajPromene();
+                return true;
+            }
+            catch
+            {
+                return false;
             }
         }
     }

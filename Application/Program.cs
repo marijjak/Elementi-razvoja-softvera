@@ -30,7 +30,10 @@ namespace Loger_Bloger
 
 
             // TODO: Dodati ostale repozitorijume 
-            biljkeRepozitorijum.ObrisiPrazne();
+            if (!biljkeRepozitorijum.ObrisiPrazne())
+            {
+                Console.WriteLine("Upozorenje: čišćenje praznih biljaka nije uspelo.");
+            }
 
             // Servisi
             IAutentifikacijaServis autentifikacijaServis = new AutentifikacioniServis(korisniciRepozitorijum);

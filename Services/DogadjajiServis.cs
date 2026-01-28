@@ -19,10 +19,10 @@ namespace Services
             _repo = repo;
         }
 
-        public void Zabelezi(string opis, TipEvidencije tip, Guid? entitetId = null)
+        public bool Zabelezi(string opis, TipEvidencije tip, Guid? entitetId = null)
         {
             var dogadjaj = new Dogadjaj(opis, tip, entitetId);
-            _repo.Dodaj(dogadjaj);
+            return _repo.Dodaj(dogadjaj);
         }
 
         public IEnumerable<Dogadjaj> SviDogadjaji()

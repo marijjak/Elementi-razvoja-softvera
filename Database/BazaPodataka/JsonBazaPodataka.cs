@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Domain.BazaPodataka;
 using System.Text.Json;
+using Domain.Konstante;
 
 namespace Database.BazaPodataka
 {
@@ -16,9 +17,10 @@ namespace Database.BazaPodataka
 
         public JsonBazaPodataka()
         {
-            if (File.Exists(Putanja))
+            if (File.Exists(KONSTANTE.PutanjaBaze))
             {
-                var json = File.ReadAllText(Putanja);
+           
+                var json = File.ReadAllText(KONSTANTE.PutanjaBaze);
                 Tabele = JsonSerializer.Deserialize<TabeleBazaPodataka>(json)
                          ?? new TabeleBazaPodataka();
             }
@@ -37,7 +39,7 @@ namespace Database.BazaPodataka
             };
 
             var json = JsonSerializer.Serialize(Tabele, opcije);
-            File.WriteAllText(Putanja, json);
+            File.WriteAllText(KONSTANTE.PutanjaBaze, json);
             return true;
         }
     }

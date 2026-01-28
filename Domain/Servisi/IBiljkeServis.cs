@@ -11,9 +11,9 @@ namespace Domain.Servisi
     {
         Biljka DodajBiljku(Biljka biljka);
         bool OznaciBiljkuKaoUbranu(Guid id);
-        void PromeniStanje(Guid biljkaId);
+        bool PromeniStanje(Guid biljkaId);
         IEnumerable<Biljka> SveBiljke();
         bool ZasadiNovuBiljku(string naziv, string latinski, string zemlja, double jacina);
-        void PromeniJacinuUljaProcentualno(string unos, double procenat);
+        bool PromeniJacinuUljaProcentualno(string unos, double procenat);
     }
 }

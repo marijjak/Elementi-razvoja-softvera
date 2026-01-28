@@ -30,12 +30,17 @@ namespace Database.Repozitorijumi
             return _baza.Tabele.Ambalaze;
         }
 
-        public void Azuriraj(Ambalaza ambalaza)
+        public bool Azuriraj(Ambalaza ambalaza)
         {
-            var postojeca = _baza.Tabele.Ambalaze.FirstOrDefault(a => a.Id == ambalaza.Id);
-
-            if (postojeca != null)
+            try
             {
+                var postojeca = _baza.Tabele.Ambalaze.FirstOrDefault(a => a.Id == ambalaza.Id);
+
+                if (postojeca == null)
+                {
+                    return false;
+                }
+
                 postojeca.Naziv = ambalaza.Naziv;
                 postojeca.AdresaPosiljaoca = ambalaza.AdresaPosiljaoca;
                 postojeca.SkladisteId = ambalaza.SkladisteId;
@@ -43,6 +48,11 @@ namespace Database.Repozitorijumi
                 postojeca.Status = ambalaza.Status;
 
                 _baza.SacuvajPromene();
+                return true;
+            }
+            catch
+            {
+                return false;
             }
         }
     }

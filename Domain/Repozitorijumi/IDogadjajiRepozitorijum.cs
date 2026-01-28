@@ -9,7 +9,7 @@ namespace Domain.Repozitorijumi
 {
     public interface IDogadjajiRepozitorijum
     {
-        void Dodaj(Dogadjaj dogadjaj);
+        bool Dodaj(Dogadjaj dogadjaj);
         IEnumerable<Dogadjaj> Sve();
     }
 }
