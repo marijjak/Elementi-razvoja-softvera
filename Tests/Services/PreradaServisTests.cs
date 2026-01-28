@@ -27,5 +27,7 @@ namespace Tests.Services
             // Assert - Proveri da li se i ovde poziva logger
             Assert.Pass(); // Privremeni pass dok ne povežeš logiku
         }
+
+       
     }
 }

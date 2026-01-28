@@ -26,9 +26,6 @@ namespace Domain.Modeli
 
         public DateTime DatumKreiranja { get; set; } = DateTime.Now;
 
-        public void GenerisiSerijskiBroj()
-        {
-            SerijskiBroj = $"PP-2025-{Id.ToString().Substring(0, 8).ToUpper()}";
-        }
+      
     }
 }

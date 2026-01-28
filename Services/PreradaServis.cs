@@ -2,6 +2,7 @@
 using Domain.Modeli;
 using Domain.Repozitorijumi;
 using Domain.Servisi;
+using Domain.PomocneMetode;
 using System;
 using System.Collections.Generic;
 using System.Linq;

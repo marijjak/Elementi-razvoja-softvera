@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <Folder Include="Konstante\" />
-    <Folder Include="PomocneMetode\" />
   </ItemGroup>
 
 </Project>
