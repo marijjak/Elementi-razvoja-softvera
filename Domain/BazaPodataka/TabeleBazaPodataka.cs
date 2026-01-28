@@ -14,7 +14,7 @@ namespace Domain.BazaPodataka
         public List<Ambalaza> Ambalaze { get; set; } = [];
 
         //  Add other database tables as needed
-
+        public List<Skladiste> Skladista { get; set; } = new();
         public TabeleBazaPodataka() { }
     }
 }
