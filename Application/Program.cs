@@ -28,7 +28,6 @@ namespace Loger_Bloger
 
 
 
-
             // TODO: Dodati ostale repozitorijume 
             if (!biljkeRepozitorijum.ObrisiPrazne())
             {
@@ -41,6 +40,8 @@ namespace Loger_Bloger
             IBiljkeServis biljkeServis = new BiljkeServis(biljkeRepozitorijum, dogadjajiServis);
             IPreradaServis preradaServis = new PreradaServis(biljkeServis, perfumeRepo);
             IAmbalazaServis ambalazaServis = new AmbalazaServis(ambalazaRepozitorijum, dogadjajiServis, perfumeRepo);
+
+            IMagacinskiCentarServis magacinServis = new MagacinskiCentarServis(ambalazaRepozitorijum, dogadjajiServis);
 
             // TODO: Dodati ostale servise 
 
@@ -145,6 +146,7 @@ namespace Loger_Bloger
                 preradaServis,
                 perfumeRepo,
                 ambalazaServis,
+                magacinServis,
                 prijavljen
             );
             meni.PrikaziGlavniMeni();

@@ -14,6 +14,7 @@ namespace Presentation.Meni
         private readonly IPreradaServis _preradaServis;
         private readonly IPerfumeRepository _parfemRepo;
         private readonly IAmbalazaServis _ambalazaServis;
+        private readonly IMagacinskiCentarServis _magacinServis;
 
         private Korisnik _ulogovan;
 
@@ -22,6 +23,7 @@ namespace Presentation.Meni
             IBiljkeServis biljkeServis, IDogadjajiServis dogadjajiServis, IPreradaServis preradaServis,
             IPerfumeRepository parfemRepo,
             IAmbalazaServis ambalazaServis,
+            IMagacinskiCentarServis magacinServis,
             Korisnik ulogovan)
         {
             _authServis = authServis;
@@ -30,6 +32,7 @@ namespace Presentation.Meni
             _preradaServis = preradaServis;
             _parfemRepo = parfemRepo;
             _ambalazaServis = ambalazaServis;
+            _magacinServis = magacinServis;
             _ulogovan = ulogovan;
         }
 
@@ -54,6 +57,11 @@ namespace Presentation.Meni
                 {
                     Console.WriteLine("3. Pregeld biljaka");
 
+                }
+                if (_ulogovan.Uloga == TipKorisnika.Prodavac)
+                {
+                    Console.WriteLine("3. Pregled biljaka");
+                    Console.WriteLine("4. Standardna isporuka (Magacinski centar)");
                 }
 
                 Console.WriteLine("0. Odjava");
@@ -81,6 +89,12 @@ namespace Presentation.Meni
                         PregledBiljaka();
                         break;
 
+                    case "4":
+                        if (_ulogovan.Uloga == TipKorisnika.Prodavac)
+                        {
+                            IzvrsiIsporuku();
+                        }
+                        break;
                     case "0":
                         kraj = true;
                         Console.WriteLine("Uspešno ste se odjavili.");
@@ -592,6 +606,31 @@ namespace Presentation.Meni
             {
                 Pauza($"Greška: {ex.Message}");
             }
+        }
+
+        private void IzvrsiIsporuku()
+        {
+            Console.Clear();
+            Console.WriteLine("=== STANDARDNA ISPORUKA (2.5s) ===");
+            var ambalaze = _ambalazaServis.SveAmbalaze().Where(a => a.Status == StatusAmbalaze.Spakovana).ToList();
+
+            if (!ambalaze.Any())
+            {
+                Pauza("Nema spremnih ambalaža za slanje.");
+                return;
+            }
+
+            foreach (var a in ambalaze)
+                Console.WriteLine($"ID: {a.Id} | Naziv: {a.Naziv}");
+
+            Console.Write("\nUnesite ID ambalaže za slanje: ");
+            if (Guid.TryParse(Console.ReadLine(), out Guid id))
+            {
+                Console.WriteLine("Slanje u toku... sačekajte 2.5s...");
+                _magacinServis.PosaljiPaketAsync(id).Wait();
+                Console.WriteLine("Paket je uspešno poslat!");
+            }
+            Pauza("");
         }
 
     }
