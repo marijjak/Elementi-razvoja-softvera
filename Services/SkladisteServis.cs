@@ -17,7 +17,10 @@ namespace Services
         {
             _repo = repo;
         }
-
+        public bool PostojiSkladiste(Guid skladisteId)
+        {
+            return _repo.NadjiPoId(skladisteId) != null;
+        }
         public bool DodajAmbalazuUSkladiste(Guid skladisteId, int kolicina)
         {
             var skladiste = _repo.NadjiPoId(skladisteId);

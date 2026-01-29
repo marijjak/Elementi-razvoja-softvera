@@ -27,7 +27,20 @@ namespace Loger_Bloger
             IAmbalazaRepozitorijum ambalazaRepozitorijum = new AmbalazaRepozitorijum(bazaPodataka);
             ISkladisteRepozitorijum skladisteRepozitorijum = new SkladisteRepozitorijum(bazaPodataka);
 
-
+            if (!bazaPodataka.Tabele.Skladista.Any())
+            {
+                Guid pocetnoSkladisteId = Guid.Parse("3f2504e0-4f89-11d3-9a0c-0305e82c3301");
+                var pocetnoSkladiste = new Skladiste
+                {
+                    Id = pocetnoSkladisteId,
+                    Naziv = "Glavno skladište",
+                    MaxBrojAmbalaza = 100,
+                    TrenutniBrojAmbalaza = 0
+                };
+                bazaPodataka.Tabele.Skladista.Add(pocetnoSkladiste);
+                bazaPodataka.SacuvajPromene();
+                Console.WriteLine($"Kreirano početno skladište: {pocetnoSkladiste.Naziv} (ID: {pocetnoSkladiste.Id}).");
+            }
 
             // TODO: Dodati ostale repozitorijume 
             if (!biljkeRepozitorijum.ObrisiPrazne())

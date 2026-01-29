@@ -33,6 +33,10 @@ namespace Services
             {
                 throw new ArgumentException("Adresa pošiljaoca je obavezna.");
             }
+            if (!_skladisteServis.PostojiSkladiste(skladisteId))
+            {
+                throw new InvalidOperationException("Skladište nije pronađeno.");
+            }
             if (!_skladisteServis.DodajAmbalazuUSkladiste(skladisteId, 1))
             {
                 throw new InvalidOperationException("Skladište nema dovoljno kapaciteta za novu ambalažu.");

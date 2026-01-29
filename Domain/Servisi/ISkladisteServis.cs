@@ -8,6 +8,8 @@ namespace Domain.Servisi
 {
     public interface ISkladisteServis
     {
+
+        bool PostojiSkladiste(Guid skladisteId);
         bool DodajAmbalazuUSkladiste(Guid skladisteId, int kolicina);
 
     }
