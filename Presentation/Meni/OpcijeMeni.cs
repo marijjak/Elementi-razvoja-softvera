@@ -15,6 +15,7 @@ namespace Presentation.Meni
         private readonly IPerfumeRepository _parfemRepo;
         private readonly IAmbalazaServis _ambalazaServis;
         private readonly IMagacinskiCentarServis _magacinServis;
+        private readonly IDistributivniCentarServis _distributivniCentarServis;
 
         private Korisnik _ulogovan;
 
@@ -24,6 +25,7 @@ namespace Presentation.Meni
             IPerfumeRepository parfemRepo,
             IAmbalazaServis ambalazaServis,
             IMagacinskiCentarServis magacinServis,
+            IDistributivniCentarServis distributivniCentarServis,
             Korisnik ulogovan)
         {
             _authServis = authServis;
@@ -33,6 +35,7 @@ namespace Presentation.Meni
             _parfemRepo = parfemRepo;
             _ambalazaServis = ambalazaServis;
             _magacinServis = magacinServis;
+            _distributivniCentarServis = distributivniCentarServis;
             _ulogovan = ulogovan;
         }
 
@@ -134,6 +137,7 @@ namespace Presentation.Meni
                 Console.WriteLine("5. Pregled važnih događaja");
                 Console.WriteLine("6. Prerada biljaka u parfeme");
                 Console.WriteLine("7. Upravljanje ambalažom");
+                Console.WriteLine("8. Brza distribucija (Distributivni centar)");
                 Console.WriteLine("0. Nazad");
                 Console.Write("Izbor: ");
 
@@ -167,7 +171,9 @@ namespace Presentation.Meni
                     case "7":
                         UpravljanjeAmbalazom();
                         break;
-
+                    case "8":
+                        BrzaDistribucija();
+                        break;
                     case "0":
                         nazad = true;
                         break;
@@ -632,6 +638,39 @@ namespace Presentation.Meni
             }
             Pauza("");
         }
+        private void BrzaDistribucija()
+        {
+            Console.Clear();
+            Console.WriteLine("=== BRZA DISTRIBUCIJA (3 paketa / 0.5s) ===");
 
+            var ambalaze = _ambalazaServis.SveAmbalaze()
+                .Where(a => a.Status == StatusAmbalaze.Spakovana)
+                .ToList();
+
+            if (!ambalaze.Any())
+            {
+                Pauza("Nema spremnih ambalaža za slanje.");
+                return;
+            }
+
+            Console.WriteLine("Spremne ambalaže:");
+            foreach (var a in ambalaze)
+            {
+                Console.WriteLine($"ID: {a.Id} | Naziv: {a.Naziv}");
+            }
+
+            Console.Write("\nUnesite ID-eve ambalaža za slanje (max 3, zarezom odvojeno): ");
+            string unos = Console.ReadLine() ?? "";
+            var ambalazaIds = unos
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(deo => Guid.TryParse(deo, out Guid id) ? id : Guid.Empty)
+                .Where(id => id != Guid.Empty)
+                .ToList();
+
+            Console.WriteLine("Slanje u toku... sačekajte 0.5s...");
+            var poslato = _distributivniCentarServis.PosaljiPaketeAsync(ambalazaIds).Result;
+            Console.WriteLine($"Poslato paketa: {poslato}");
+            Pauza("");
+        }
     }
 }

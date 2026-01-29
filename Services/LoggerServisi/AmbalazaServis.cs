@@ -13,15 +13,18 @@ namespace Services
         private readonly IAmbalazaRepozitorijum _repo;
         private readonly IDogadjajiServis _dogadjajiServis;
         private readonly IPerfumeRepository _parfemRepo;
+        private readonly ISkladisteServis _skladisteServis;
 
         public AmbalazaServis(
             IAmbalazaRepozitorijum repo,
             IDogadjajiServis dogadjajiServis,
-            IPerfumeRepository parfemRepo)
+           IPerfumeRepository parfemRepo,
+            ISkladisteServis skladisteServis)
         {
             _repo = repo;
             _dogadjajiServis = dogadjajiServis;
             _parfemRepo = parfemRepo;
+            _skladisteServis = skladisteServis;
         }
 
         public Ambalaza KreirajAmbalazu(string naziv, string adresaPosiljaoca, Guid skladisteId, IEnumerable<Guid> parfemIds)
@@ -30,7 +33,10 @@ namespace Services
             {
                 throw new ArgumentException("Adresa pošiljaoca je obavezna.");
             }
-
+            if (!_skladisteServis.DodajAmbalazuUSkladiste(skladisteId, 1))
+            {
+                throw new InvalidOperationException("Skladište nema dovoljno kapaciteta za novu ambalažu.");
+            }
             Ambalaza ambalaza = new Ambalaza
             {
                 Naziv = string.IsNullOrWhiteSpace(naziv) ? "Ambalaža" : naziv,

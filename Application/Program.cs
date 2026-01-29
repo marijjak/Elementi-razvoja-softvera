@@ -25,6 +25,7 @@ namespace Loger_Bloger
             IDogadjajiRepozitorijum dogadjajiRepozitorijum = new DogadjajiRepozitorijum(bazaPodataka);
             IPerfumeRepository perfumeRepo = new PerfumeRepository(bazaPodataka);
             IAmbalazaRepozitorijum ambalazaRepozitorijum = new AmbalazaRepozitorijum(bazaPodataka);
+            ISkladisteRepozitorijum skladisteRepozitorijum = new SkladisteRepozitorijum(bazaPodataka);
 
 
 
@@ -33,15 +34,18 @@ namespace Loger_Bloger
             {
                 Console.WriteLine("Upozorenje: čišćenje praznih biljaka nije uspelo.");
             }
+            ISkladisteRepozitorijum skladisteRepozitorijum = new SkladisteRepozitorijum(bazaPodataka);
 
             // Servisi
             IAutentifikacijaServis autentifikacijaServis = new AutentifikacioniServis(korisniciRepozitorijum);
             IDogadjajiServis dogadjajiServis = new DogadjajiServis(dogadjajiRepozitorijum);
             IBiljkeServis biljkeServis = new BiljkeServis(biljkeRepozitorijum, dogadjajiServis);
             IPreradaServis preradaServis = new PreradaServis(biljkeServis, perfumeRepo);
-            IAmbalazaServis ambalazaServis = new AmbalazaServis(ambalazaRepozitorijum, dogadjajiServis, perfumeRepo);
+            ISkladisteServis skladisteServis = new SkladisteServis(skladisteRepozitorijum);
+            IAmbalazaServis ambalazaServis = new AmbalazaServis(ambalazaRepozitorijum, dogadjajiServis, perfumeRepo, skladisteServis);
 
             IMagacinskiCentarServis magacinServis = new MagacinskiCentarServis(ambalazaRepozitorijum, dogadjajiServis);
+            IDistributivniCentarServis distributivniCentarServis = new DistributivniCentarServis(ambalazaRepozitorijum, dogadjajiServis);
 
             // TODO: Dodati ostale servise 
 
@@ -147,6 +151,7 @@ namespace Loger_Bloger
                 perfumeRepo,
                 ambalazaServis,
                 magacinServis,
+                distributivniCentarServis,
                 prijavljen
             );
             meni.PrikaziGlavniMeni();
