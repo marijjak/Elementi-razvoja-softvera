@@ -473,7 +473,7 @@ namespace Presentation.Meni
             Guid skladisteId;
             while (true)
             {
-                Console.Write("ID skladišta (GUID) ( xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx) : ");
+                Console.Write("ID skladišta (GUID) ( Primer: 3f2504e0-4f89-11d3-9a0c-0305e82c3301) : ");
                 string unosSkladiste = Console.ReadLine() ?? "";
                 if (Guid.TryParse(unosSkladiste, out skladisteId))
                 {
