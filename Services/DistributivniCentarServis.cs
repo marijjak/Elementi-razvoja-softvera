@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Services
 {
-    public class DistributivniCentarServis : IDistributivniCentarServis
+    public class DistributivniCentarServis : IDistributivniCentarServis, ISkladisniLogistickiServis
     {
         private readonly IAmbalazaRepozitorijum _ambalazaRepo;
         private readonly IDogadjajiServis _dogadjajiServis;
@@ -52,6 +52,12 @@ namespace Services
             }
 
             return paketiZaSlanje.Count;
+        }
+        public async Task<bool> ProcesuirajIsporukuAsync(Guid ambalazaId)
+        {
+           
+            var rezultat = await PosaljiPaketeAsync(new List<Guid> { ambalazaId });
+            return rezultat > 0;
         }
     }
 }

@@ -57,15 +57,13 @@ namespace Loger_Bloger
             ISkladisteServis skladisteServis = new SkladisteServis(skladisteRepozitorijum);
             IAmbalazaServis ambalazaServis = new AmbalazaServis(ambalazaRepozitorijum, dogadjajiServis, perfumeRepo, skladisteServis);
 
-            IMagacinskiCentarServis magacinServis = new MagacinskiCentarServis(ambalazaRepozitorijum, dogadjajiServis);
-            IDistributivniCentarServis distributivniCentarServis = new DistributivniCentarServis(ambalazaRepozitorijum, dogadjajiServis);
-
-            // TODO: Dodati ostale servise 
-
-            // Ako nema nijednog korisnika u sistemu, dodati dva nova
+            MagacinskiCentarServis magacinServis = new MagacinskiCentarServis(ambalazaRepozitorijum, dogadjajiServis);
+            DistributivniCentarServis distributivniCentarServis = new DistributivniCentarServis(ambalazaRepozitorijum, dogadjajiServis);
+            ISkladisteProvider skladisteProvider = new SkladisteProvider(magacinServis, distributivniCentarServis);
+          
             if (korisniciRepozitorijum.SviKorisnici().Count() == 0)
             {
-                // Dodavanje početnih korisnika prema specifikaciji
+              
                 Korisnik menadzer = new Korisnik(
                     "menadzer",
                     "menadzer123",
@@ -89,11 +87,11 @@ namespace Loger_Bloger
                 Console.WriteLine();
             }
 
-            // Prezentacioni sloj - Autentifikacija
+           
             AutentifikacioniMeni am = new AutentifikacioniMeni(autentifikacijaServis);
             Korisnik prijavljen = new Korisnik();
 
-            // Petlja za prijavu/registraciju
+        
             bool uspesnoPrijavljen = false;
             while (!uspesnoPrijavljen)
             {
@@ -109,7 +107,7 @@ namespace Loger_Bloger
                 switch (opcija.Trim())
                 {
                     case "1":
-                        // Pokušaj prijave
+                      
                         if (am.TryLogin(out prijavljen))
                         {
                             uspesnoPrijavljen = true;
@@ -123,7 +121,7 @@ namespace Loger_Bloger
                         break;
 
                     case "2":
-                        // Pokušaj registracije
+                       
                         if (am.TryRegister(out prijavljen))
                         {
                             Console.WriteLine($"\nUspešno ste se registrovali kao: {prijavljen.ImePrezime}");
@@ -149,13 +147,12 @@ namespace Loger_Bloger
                 }
             }
 
-            // Uspešna prijava
             Console.Clear();
             Console.WriteLine($"\nUspešno ste prijavljeni kao: {prijavljen.ImePrezime} ({prijavljen.Uloga})");
             Console.WriteLine("Pritisnite bilo koji taster za nastavak...");
             Console.ReadKey();
 
-            // Glavni meni aplikacije
+      
             OpcijeMeni meni = new OpcijeMeni(
                 autentifikacijaServis,
                 biljkeServis, 
@@ -165,7 +162,8 @@ namespace Loger_Bloger
                 ambalazaServis,
                 magacinServis,
                 distributivniCentarServis,
-                prijavljen
+                prijavljen,
+                skladisteProvider
             );
             meni.PrikaziGlavniMeni();
         }

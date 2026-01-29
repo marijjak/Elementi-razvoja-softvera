@@ -9,7 +9,7 @@ using Domain.Enumeracije;
 
 namespace Services
 {
-    public class MagacinskiCentarServis : IMagacinskiCentarServis
+    public class MagacinskiCentarServis : IMagacinskiCentarServis, ISkladisniLogistickiServis
     {
         private readonly IAmbalazaRepozitorijum _ambalazaRepo;
         private readonly IDogadjajiServis _dogadjajiServis;
@@ -35,5 +35,7 @@ namespace Services
 
             return true;
         }
+        public async Task<bool> ProcesuirajIsporukuAsync(Guid ambalazaId)
+        => await PosaljiPaketAsync(ambalazaId);
     }
 }

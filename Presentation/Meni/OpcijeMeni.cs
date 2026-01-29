@@ -16,6 +16,7 @@ namespace Presentation.Meni
         private readonly IAmbalazaServis _ambalazaServis;
         private readonly IMagacinskiCentarServis _magacinServis;
         private readonly IDistributivniCentarServis _distributivniCentarServis;
+        private readonly ISkladisteProvider _skladisteProvider;
 
         private Korisnik _ulogovan;
 
@@ -26,7 +27,8 @@ namespace Presentation.Meni
             IAmbalazaServis ambalazaServis,
             IMagacinskiCentarServis magacinServis,
             IDistributivniCentarServis distributivniCentarServis,
-            Korisnik ulogovan)
+            Korisnik ulogovan,
+            ISkladisteProvider skladisteProvider)
         {
             _authServis = authServis;
             _biljkeServis = biljkeServis;
@@ -37,6 +39,46 @@ namespace Presentation.Meni
             _magacinServis = magacinServis;
             _distributivniCentarServis = distributivniCentarServis;
             _ulogovan = ulogovan;
+            _skladisteProvider = skladisteProvider;
+        }
+        private async Task ProcesuirajLogistiku()
+        {
+            Console.Clear();
+            Console.WriteLine($"=== PROCESUIRANJE ISPORUKE ({_ulogovan.Uloga}) ===");
+
+            var ambalaze = _ambalazaServis.SveAmbalaze()
+                .Where(a => a.Status == StatusAmbalaze.Spakovana)
+                .ToList();
+
+            if (!ambalaze.Any())
+            {
+                Pauza("Nema spremnih ambalaža za slanje.");
+                return;
+            }
+
+            foreach (var a in ambalaze)
+                Console.WriteLine($"ID: {a.Id} | Naziv: {a.Naziv}");
+
+            Console.Write("\nUnesite ID ambalaže za procesuiranje: ");
+            if (Guid.TryParse(Console.ReadLine(), out Guid id))
+            {
+                try
+                {
+       
+                    var adekvatanServis = _skladisteProvider.GetServisPoUlozi(_ulogovan.Uloga.ToString());
+
+                    Console.WriteLine("Slanje u toku...");
+                    bool uspeh = await adekvatanServis.ProcesuirajIsporukuAsync(id);
+
+                    if (uspeh) Console.WriteLine("Isporuka uspešno procesuirana!");
+                    else Console.WriteLine("Greška prilikom isporuke.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Greška: {ex.Message}");
+                }
+            }
+            Pauza("");
         }
 
         // ==================== GLAVNI MENI  ====================
@@ -95,7 +137,7 @@ namespace Presentation.Meni
                     case "4":
                         if (_ulogovan.Uloga == TipKorisnika.Prodavac)
                         {
-                            IzvrsiIsporuku();
+                            ProcesuirajLogistiku().Wait();
                         }
                         break;
                     case "0":
@@ -172,7 +214,7 @@ namespace Presentation.Meni
                         UpravljanjeAmbalazom();
                         break;
                     case "8":
-                        BrzaDistribucija();
+                        ProcesuirajLogistiku().Wait();
                         break;
                     case "0":
                         nazad = true;
@@ -245,14 +287,14 @@ namespace Presentation.Meni
                 // Proveravamo da li je unos broj i da li je u dozvoljenim granicama
                 if (double.TryParse(unos, out jacina) && jacina >= 1.0 && jacina <= 5.0)
                 {
-                    break; // Unos je ispravan, izlazimo iz petlje
+                    break;
                 }
 
                 Console.WriteLine("Greška: Neispravan unos. Jačina mora biti broj između 1.0 i 5.0.");
             }
 
 
-            // Poziv servisa koji će preko repozitorijuma sačuvati biljku u JSON
+            
             bool uspeh = _biljkeServis.ZasadiNovuBiljku(naziv, latinski, zemlja, jacina);
 
             if (uspeh)
@@ -265,12 +307,12 @@ namespace Presentation.Meni
         private void PrilagodiMirisBiljke()
         {
             Console.Clear();
-            PregledBiljaka(); // Prvo prikažemo listu da korisnik vidi ID ili naziv
+            PregledBiljaka(); 
 
             Console.Write("\nUnesite naziv biljke za promenu: ");
             string naziv = Console.ReadLine() ?? "";
 
-            // Pronađi prvu biljku sa tim nazivom
+   
             var biljka = _biljkeServis.SveBiljke().FirstOrDefault(b => b.OpstiNaziv.Equals(naziv, StringComparison.OrdinalIgnoreCase));
 
             if (biljka != null)
@@ -301,7 +343,7 @@ namespace Presentation.Meni
             Console.Clear();
             Console.WriteLine("\n Označavanje biljke kao ubrane. \n");
 
-            // Prikažemo biljke da korisnik vidi stanje
+    
             var biljke = _biljkeServis.SveBiljke();
 
             if (biljke == null || !biljke.Any())
@@ -614,63 +656,6 @@ namespace Presentation.Meni
             }
         }
 
-        private void IzvrsiIsporuku()
-        {
-            Console.Clear();
-            Console.WriteLine("=== STANDARDNA ISPORUKA (2.5s) ===");
-            var ambalaze = _ambalazaServis.SveAmbalaze().Where(a => a.Status == StatusAmbalaze.Spakovana).ToList();
-
-            if (!ambalaze.Any())
-            {
-                Pauza("Nema spremnih ambalaža za slanje.");
-                return;
-            }
-
-            foreach (var a in ambalaze)
-                Console.WriteLine($"ID: {a.Id} | Naziv: {a.Naziv}");
-
-            Console.Write("\nUnesite ID ambalaže za slanje: ");
-            if (Guid.TryParse(Console.ReadLine(), out Guid id))
-            {
-                Console.WriteLine("Slanje u toku... sačekajte 2.5s...");
-                _magacinServis.PosaljiPaketAsync(id).Wait();
-                Console.WriteLine("Paket je uspešno poslat!");
-            }
-            Pauza("");
-        }
-        private void BrzaDistribucija()
-        {
-            Console.Clear();
-            Console.WriteLine("=== BRZA DISTRIBUCIJA (3 paketa / 0.5s) ===");
-
-            var ambalaze = _ambalazaServis.SveAmbalaze()
-                .Where(a => a.Status == StatusAmbalaze.Spakovana)
-                .ToList();
-
-            if (!ambalaze.Any())
-            {
-                Pauza("Nema spremnih ambalaža za slanje.");
-                return;
-            }
-
-            Console.WriteLine("Spremne ambalaže:");
-            foreach (var a in ambalaze)
-            {
-                Console.WriteLine($"ID: {a.Id} | Naziv: {a.Naziv}");
-            }
-
-            Console.Write("\nUnesite ID-eve ambalaža za slanje (max 3, zarezom odvojeno): ");
-            string unos = Console.ReadLine() ?? "";
-            var ambalazaIds = unos
-                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Select(deo => Guid.TryParse(deo, out Guid id) ? id : Guid.Empty)
-                .Where(id => id != Guid.Empty)
-                .ToList();
-
-            Console.WriteLine("Slanje u toku... sačekajte 0.5s...");
-            var poslato = _distributivniCentarServis.PosaljiPaketeAsync(ambalazaIds).Result;
-            Console.WriteLine($"Poslato paketa: {poslato}");
-            Pauza("");
-        }
+  
     }
 }

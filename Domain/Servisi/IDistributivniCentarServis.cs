@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Servisi
 {
-    public interface IDistributivniCentarServis
+    public interface IDistributivniCentarServis : ISkladisniLogistickiServis
     {
         Task<int> PosaljiPaketeAsync(IEnumerable<Guid> ambalazaIds);
     }
