@@ -34,7 +34,7 @@ namespace Loger_Bloger
             {
                 Console.WriteLine("Upozorenje: čišćenje praznih biljaka nije uspelo.");
             }
-            ISkladisteRepozitorijum skladisteRepozitorijum = new SkladisteRepozitorijum(bazaPodataka);
+           
 
             // Servisi
             IAutentifikacijaServis autentifikacijaServis = new AutentifikacioniServis(korisniciRepozitorijum);
