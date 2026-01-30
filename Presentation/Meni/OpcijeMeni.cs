@@ -93,15 +93,17 @@ namespace Presentation.Meni
                 Console.WriteLine($"\n===== GLAVNI MENI - Ulogovan korisnik: {_ulogovan.ImePrezime} ({_ulogovan.Uloga}) =====");
 
                 Console.WriteLine("1. Moj profil");
-
                 if (_ulogovan.Uloga == TipKorisnika.MenadzerProdaje)
                 {
                     Console.WriteLine("2. Menadžerske opcije");
-                    Console.WriteLine("3. Pregled biljaka");
                 }
-                else if (_ulogovan.Uloga == TipKorisnika.Prodavac)
+                else
                 {
                     Console.WriteLine("2. Pregled biljaka");
+                }
+
+                if (_ulogovan.Uloga == TipKorisnika.Prodavac)
+                {
                     Console.WriteLine("3. Standardna isporuka (Magacinski centar)");
                     Console.WriteLine("4. Interaktivni prodajni katalog");
                 }
@@ -110,7 +112,6 @@ namespace Presentation.Meni
                 Console.Write("Izbor: ");
 
                 string izbor = Console.ReadLine() ?? "";
-
                 switch (izbor.Trim())
                 {
                     case "1":
@@ -124,20 +125,17 @@ namespace Presentation.Meni
                         }
                         else
                         {
-                            Pauza("Nemate pravo pristupa.");
+                            PregledBiljaka();
                         }
                         break;
                     case "3":
-                        PregledBiljaka();
-                        break;
-
-                    case "4":
                         if (_ulogovan.Uloga == TipKorisnika.Prodavac)
                         {
                             ProcesuirajLogistiku().Wait();
                         }
                         break;
-                    case "5":
+
+                    case "4":
                         if (_ulogovan.Uloga == TipKorisnika.Prodavac)
                         {
                             InteraktivniProdajniKatalog();
@@ -491,7 +489,29 @@ namespace Presentation.Meni
                 return;
             }
 
-            Pauza($"Rezervisano {kolicina} bočica parfema '{odabrani.Naziv}'.");
+            PrikaziFiskalniRacun(odabrani, kolicina);
+        }
+
+        private void PrikaziFiskalniRacun(Parfem parfem, int kolicina)
+        {
+            decimal cenaPoBocici = IzracunajCenuPoBocici(parfem);
+            decimal ukupno = cenaPoBocici * kolicina;
+
+            Console.Clear();
+            Console.WriteLine("\n===== FISKALNI RAČUN =====");
+            Console.WriteLine($"Datum: {DateTime.Now:dd.MM.yyyy HH:mm}");
+            Console.WriteLine($"Parfem: {parfem.Naziv} ({parfem.TipParfema})");
+            Console.WriteLine($"Zapremina: {parfem.ZapreminaBociceMl}ml");
+            Console.WriteLine($"Količina: {kolicina}");
+            Console.WriteLine($"Jedinična cena: {cenaPoBocici:N2} RSD");
+            Console.WriteLine($"Ukupan iznos: {ukupno:N2} RSD");
+            Pauza("Pritisnite bilo koji taster za nastavak...");
+        }
+
+        private static decimal IzracunajCenuPoBocici(Parfem parfem)
+        {
+            const decimal cenaPoMl = 10m;
+            return parfem.ZapreminaBociceMl * cenaPoMl;
         }
         private void KreirajParfemMeni()
         {
