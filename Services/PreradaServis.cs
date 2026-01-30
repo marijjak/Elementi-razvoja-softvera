@@ -46,7 +46,7 @@ namespace Services
                 // Jačina se nasumično generiše pri sađenju (npr. između 1.0 i 5.0)
                 double nasumicnaJacina = new Random().NextDouble() * (5.0 - 1.0) + 1.0;
 
-                if (!_biljkeServis.ZasadiNovuBiljku(tipParfema, "L. Nova", "Srbija", nasumicnaJacina))
+                if (!_biljkeServis.ZasadiNovuBiljku("Naknadno zasadjena", "L. Nova", "Srbija", nasumicnaJacina))
                 {
                     throw new InvalidOperationException("Neuspešno sađenje biljke.");
                 }
