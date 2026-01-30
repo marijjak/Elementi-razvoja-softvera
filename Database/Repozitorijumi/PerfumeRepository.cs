@@ -34,5 +34,18 @@ namespace Database.Repozitorijumi
         {
             return _baza.Tabele.Parfemi;
         }
+        public bool AzurirajKolicinu(Guid parfemId, int novaKolicina)
+        {
+            var parfem = _baza.Tabele.Parfemi.FirstOrDefault(p => p.Id == parfemId);
+
+            if (parfem == null || novaKolicina < 0)
+            {
+                return false;
+            }
+
+            parfem.KolicinaNaStanju = novaKolicina;
+            _baza.SacuvajPromene();
+            return true;
+        }
     }
 }

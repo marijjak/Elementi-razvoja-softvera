@@ -97,16 +97,13 @@ namespace Presentation.Meni
                 if (_ulogovan.Uloga == TipKorisnika.MenadzerProdaje)
                 {
                     Console.WriteLine("2. Menadžerske opcije");
-                }
-                else
-                {
-                    Console.WriteLine("3. Pregeld biljaka");
-
-                }
-                if (_ulogovan.Uloga == TipKorisnika.Prodavac)
-                {
                     Console.WriteLine("3. Pregled biljaka");
-                    Console.WriteLine("4. Standardna isporuka (Magacinski centar)");
+                }
+                else if (_ulogovan.Uloga == TipKorisnika.Prodavac)
+                {
+                    Console.WriteLine("2. Pregled biljaka");
+                    Console.WriteLine("3. Standardna isporuka (Magacinski centar)");
+                    Console.WriteLine("4. Interaktivni prodajni katalog");
                 }
 
                 Console.WriteLine("0. Odjava");
@@ -138,6 +135,12 @@ namespace Presentation.Meni
                         if (_ulogovan.Uloga == TipKorisnika.Prodavac)
                         {
                             ProcesuirajLogistiku().Wait();
+                        }
+                        break;
+                    case "5":
+                        if (_ulogovan.Uloga == TipKorisnika.Prodavac)
+                        {
+                            InteraktivniProdajniKatalog();
                         }
                         break;
                     case "0":
@@ -424,6 +427,71 @@ namespace Presentation.Meni
             }
 
             Pauza("");
+        }
+        private void InteraktivniProdajniKatalog()
+        {
+            Console.Clear();
+            Console.WriteLine("\n===== INTERAKTIVNI PRODAJNI KATALOG =====");
+
+            var dostupniParfemi = _parfemRepo.Svi()
+                .Where(p => p.KolicinaNaStanju > 0)
+                .ToList();
+
+            if (!dostupniParfemi.Any())
+            {
+                Pauza("Nema dostupnih parfema na stanju.");
+                return;
+            }
+
+            foreach (var parfem in dostupniParfemi)
+            {
+                Console.WriteLine(
+                    $"ID: {parfem.Id} | {parfem.Naziv,-12} | {parfem.TipParfema,-12} | {parfem.ZapreminaBociceMl}ml | Na stanju: {parfem.KolicinaNaStanju}"
+                );
+            }
+
+            Console.Write("\nUnesite ID parfema (ili Enter za izlaz): ");
+            var unosId = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(unosId))
+            {
+                return;
+            }
+
+            if (!Guid.TryParse(unosId, out var parfemId))
+            {
+                Pauza("Nevalidan ID parfema.");
+                return;
+            }
+
+            var odabrani = dostupniParfemi.FirstOrDefault(p => p.Id == parfemId);
+            if (odabrani == null)
+            {
+                Pauza("Parfem nije pronađen ili nije dostupan.");
+                return;
+            }
+
+            Console.Write("Unesite količinu: ");
+            if (!int.TryParse(Console.ReadLine(), out var kolicina) || kolicina <= 0)
+            {
+                Pauza("Nevalidna količina.");
+                return;
+            }
+
+            if (kolicina > odabrani.KolicinaNaStanju)
+            {
+                Pauza("Tražena količina premašuje stanje na zalihama.");
+                return;
+            }
+
+            var novaKolicina = odabrani.KolicinaNaStanju - kolicina;
+            if (!_parfemRepo.AzurirajKolicinu(parfemId, novaKolicina))
+            {
+                Pauza("Nije moguće ažurirati stanje parfema.");
+                return;
+            }
+
+            Pauza($"Rezervisano {kolicina} bočica parfema '{odabrani.Naziv}'.");
         }
         private void KreirajParfemMeni()
         {

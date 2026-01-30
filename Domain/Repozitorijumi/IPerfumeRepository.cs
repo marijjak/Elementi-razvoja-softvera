@@ -11,5 +11,7 @@ namespace Domain.Repozitorijumi
     {
         Parfem Dodaj(Parfem parfem);
         IEnumerable<Parfem> Svi();
+
+        bool AzurirajKolicinu(Guid parfemId, int novaKolicina);
     }
 }
