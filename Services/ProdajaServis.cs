@@ -20,7 +20,6 @@ namespace Services
         private readonly ISkladisteServis _magacinskiCentar;
         private readonly IAmbalazaRepozitorijum _ambalazaRepo;
 
-        // Obrisani duplikati IMagacinskiCentar i IDistributivniCentar koji su pravili greške CS0102
 
         public ProdajaServis(
             IFiskalniRacunRepozitorijum racunRepo,
@@ -68,11 +67,9 @@ namespace Services
             return true;
         }
 
-        // ISPRAVLJENO: Uklonjen parametar 'Korisnik ulogovan' da bi odgovaralo interfejsu
         public async Task<bool> DodajNoviRacunAsync(FiskalniRacun racun)
         {
-            // Koristimo podatak o korisniku iz samog objekta računa ili statičkog konteksta ako postoji
-            // Ovde pretpostavljam da račun ima informaciju o tome ko ga je izdao
+  
             ISkladisteServis trenutnoSkladiste = _magacinskiCentar;
 
             var dostupnaAmbalaza = _ambalazaRepo.Sve().FirstOrDefault(a => a.Status == StatusAmbalaze.Spakovana);
@@ -83,7 +80,6 @@ namespace Services
                 return false;
             }
 
-            // Pozivamo asinkronu metodu iz skladišta koju smo ranije popravili
             bool uspehSkladiste = await trenutnoSkladiste.PosaljiPaketAsync(dostupnaAmbalaza.Id);
 
             if (!uspehSkladiste) return false;

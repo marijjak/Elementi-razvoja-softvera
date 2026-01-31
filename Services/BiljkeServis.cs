@@ -59,11 +59,10 @@ namespace Services
         {
             try
             {
-                // Kreiramo novi model biljke
+           
 
                 Biljka novaBiljka = new Biljka(naziv, latinski, jacina, zemlja);
 
-                // Postavljamo početno stanje prema zahtevu zadatka
                 if (!BiljkaPomocne.PromeniStanje(novaBiljka, StanjeBiljke.Posadjena))
                 {
                     return false;
@@ -88,7 +87,7 @@ namespace Services
         }
         public bool IzmeniMirisBiljke(Guid id, double procenat)
         {
-            var biljka = _repo.NadjiPoId(id); // Pronalaženje biljke
+            var biljka = _repo.NadjiPoId(id);
             if (biljka == null) return false;
 
             double stariMiris = biljka.JacinaArome;
@@ -140,7 +139,6 @@ namespace Services
                 {
                     double staraVrednost = biljka.JacinaArome;
 
-                    // Ако је проценат 0.65, јачина постаје 65% тренутне вредности
                     biljka.JacinaArome = biljka.JacinaArome * procenat;
                     if (biljka.JacinaArome > 5.0) biljka.JacinaArome = 5.0;
                     if (!_repo.Azuriraj(biljka))
@@ -157,7 +155,6 @@ namespace Services
                 }
                 catch (Exception ex)
                 {
-                    // Ako nešto pođe po zlu, beležimo ERROR
                     _dogadjajiServis.Zabelezi($"Greška pri procentualnoj izmeni: {ex.Message}", TipEvidencije.ERROR, biljka.Id);
                     return false;
                 }
@@ -165,7 +162,6 @@ namespace Services
             }
             else
             {
-                // Ako ne nađe po ID-u, neka zapiše grešku - bar ćemo imati fajl!
                 _dogadjajiServis.Zabelezi($"BILJKA NIJE PRONAĐENA ZA ID: {unos}", TipEvidencije.ERROR);
                 return false;
             }

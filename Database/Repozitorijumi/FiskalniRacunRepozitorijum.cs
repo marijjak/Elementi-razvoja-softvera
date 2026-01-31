@@ -34,7 +34,6 @@ namespace Database.Repozitorijumi
             {
                 try
                 {
-                    // Pretvaramo Dictionary u tekst format: ID:Kolicina,ID:Kolicina...
                     string stavkeTekst = string.Join(",", racun.Stavke.Select(s => $"{s.Key}:{s.Value}"));
 
                     string linija =
@@ -44,7 +43,7 @@ namespace Database.Repozitorijumi
                         $"{racun.TipProdaje};" +
                         $"{racun.NacinPlacanja};" +
                         $"{racun.UkupanIznos};" +
-                        $"{stavkeTekst}"; // Snimi i šta je kupljeno
+                        $"{stavkeTekst}"; 
 
                     File.AppendAllLines(_putanjaDoFajla, new[] { linija });
                     return true;

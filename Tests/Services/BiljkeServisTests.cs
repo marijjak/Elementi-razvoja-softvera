@@ -33,13 +33,10 @@ namespace Tests.Services
 
             _mockLogger.Setup(l => l.Zabelezi(It.IsAny<string>(), It.IsAny<TipEvidencije>(), It.IsAny<Guid?>()))
     .Returns(true);
-            // Act
             var rezultat = _servis.ZasadiNovuBiljku("Kamilica", "Matricaria chamomilla", "Srbija", 4.0);
 
-            // Assert
 
             Assert.That(rezultat, Is.True);
-            // Proveravamo da li BiljkeServis šalje poruku tvom loggeru
             _mockLogger.Verify(l => l.Zabelezi(
                 It.Is<string>(s => s.Contains("Zasađena nova biljka")),
                 TipEvidencije.INFO,

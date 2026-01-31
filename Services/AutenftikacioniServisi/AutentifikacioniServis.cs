@@ -17,22 +17,18 @@ namespace Services.AutenftikacioniServisi
         {
             try
             {
-                // Pronalazi korisnika po korisničkom imenu
                 Korisnik korisnik = korisniciRepozitorijum.PronadjiKorisnikaPoKorisnickomImenu(korisnickoIme);
 
-                // Ako korisnik ne postoji
                 if (korisnik.KorisnickoIme == string.Empty)
                 {
                     return (false, new Korisnik());
                 }
 
-                // Provera lozinke
                 if (korisnik.Lozinka == lozinka)
                 {
                     return (true, korisnik);
                 }
 
-                // Pogrešna lozinka
                 return (false, new Korisnik());
             }
             catch
@@ -45,7 +41,6 @@ namespace Services.AutenftikacioniServisi
         {
             try
             {
-                // Validacija podataka
                 if (string.IsNullOrWhiteSpace(noviKorisnik.KorisnickoIme) ||
                     string.IsNullOrWhiteSpace(noviKorisnik.Lozinka) ||
                     string.IsNullOrWhiteSpace(noviKorisnik.ImePrezime))
@@ -53,16 +48,13 @@ namespace Services.AutenftikacioniServisi
                     return (false, new Korisnik());
                 }
 
-                // Pokušaj dodavanja korisnika
                 Korisnik dodatiKorisnik = korisniciRepozitorijum.DodajKorisnika(noviKorisnik);
 
-                // Ako je ID postavljen, korisnik je uspešno dodat
                 if (dodatiKorisnik.Id > 0)
                 {
                     return (true, dodatiKorisnik);
                 }
 
-                // Korisnik već postoji ili greška
                 return (false, new Korisnik());
             }
             catch

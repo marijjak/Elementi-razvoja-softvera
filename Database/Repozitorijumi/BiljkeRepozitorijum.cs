@@ -20,19 +20,15 @@ namespace Database.Repozitorijumi
 
         public Biljka Dodaj(Biljka biljka)
         {
-            // Proveravamo da li ta biljka već postoji u bazi preko ID-ja
             var postojeca = _baza.Tabele.Biljke.FirstOrDefault(b => b.Id == biljka.Id);
 
             if (postojeca != null)
             {
-                // Ako postoji, ažuriramo njena polja (npr. JacinaArome)
                 postojeca.JacinaArome = biljka.JacinaArome;
                 postojeca.Stanje = biljka.Stanje;
-                // Dodaj i ostala polja ako je potrebno
             }
             else
             {
-                // Ako ne postoji, dodajemo je kao novu
                 _baza.Tabele.Biljke.Add(biljka);
             }
 
@@ -54,7 +50,6 @@ namespace Database.Repozitorijumi
         {
             try
             {
-                // Pronalazi sve biljke koje nemaju naziv (one koje prave problem)
                 var zaBrisanje = _baza.Tabele.Biljke.Where(b => string.IsNullOrEmpty(b.OpstiNaziv)).ToList();
 
                 foreach (var b in zaBrisanje)

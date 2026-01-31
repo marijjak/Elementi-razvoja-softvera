@@ -43,7 +43,6 @@ namespace Services
 
             foreach (var ambalaza in paketiZaSlanje)
             {
-                // Dodajemo proveru kako bi uklonili CS8602 upozorenje
                 if (ambalaza == null) continue;
 
                 ambalaza.Status = StatusAmbalaze.Poslata;
@@ -68,10 +67,8 @@ namespace Services
         public bool DodajAmbalazuUSkladiste(Guid skladisteId, int kolicina) => true;
 
 
-        // Ova metoda MORA postojati da bi interfejs ISkladisteServis bio zadovoljen
         public async Task<bool> PosaljiPaketAsync(Guid ambalazaId)
         {
-            // Samo preusmeravamo poziv na tvoju postojeću metodu ProcesuirajIsporukuAsync
             return await ProcesuirajIsporukuAsync(ambalazaId);
         }
     }

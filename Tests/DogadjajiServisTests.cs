@@ -28,18 +28,17 @@ namespace Tests.Services
         [Test]
         public void Zabelezi_PozivaDodajMetoduRepozitorijuma()
         {
-            // Arrange
+       
             var opis = "Testna poruka";
             var tip = TipEvidencije.INFO;
             var entitetId = Guid.NewGuid();
             _mockRepo.Setup(r => r.Dodaj(It.IsAny<Dogadjaj>())).Returns(true);
 
-            // Act
+   
             var rezultat = _servis.Zabelezi(opis, tip, entitetId);
             Assert.That(rezultat, Is.True);
 
-            // Assert
-            // Proveravamo da li je repozitorijum primio poziv za dodavanje
+      
             _mockRepo.Verify(r => r.Dodaj(It.Is<Dogadjaj>(d =>
                 d.Opis == opis &&
                 d.Tip == tip &&

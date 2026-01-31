@@ -35,16 +35,13 @@ namespace Services
             int ukupnoMl = brojBocica * zapreminaBociceMl;
             int potrebneBiljke = (int)Math.Ceiling((double)ukupnoMl / KONSTANTE.MlPoBiljci);
 
-            // 1. Dobavljanje trenutno ubranih biljaka
             var ubraneBiljke = _biljkeServis.SveBiljke()
                 .Where(b => b.Stanje == StanjeBiljke.Ubrana)
                 .Take(potrebneBiljke)
                 .ToList();
 
-            // 2. DOPUNA: Ako nedostaje biljaka, šalje se zahtev za sađenje (logika iz zahteva)
             while (ubraneBiljke.Count < potrebneBiljke)
             {
-                // Jačina se nasumično generiše pri sađenju (npr. između 1.0 i 5.0)
                 double nasumicnaJacina = new Random().NextDouble() * (5.0 - 1.0) + 1.0;
 
                 if (!_biljkeServis.ZasadiNovuBiljku("Naknadno zasadjena", "L. Nova", "Srbija", nasumicnaJacina))
@@ -60,7 +57,6 @@ namespace Services
                 ubraneBiljke.Add(novaBiljka);
             }
 
-            // 3. Prerada i promena stanja u 'Preradjena'
             foreach (var biljka in ubraneBiljke)
             {
                 if (!BiljkaPomocne.PromeniStanje(biljka, StanjeBiljke.Preradjena))
@@ -72,29 +68,23 @@ namespace Services
 
             double prosecnaJacina = ubraneBiljke.Average(b => b.JacinaArome);
 
-            // 4. RAVNOTEŽA AROMA: Ako prosečna jačina pređe 4.0
             if (prosecnaJacina > 4.0)
             {
-                // Odstupanje (npr. 4.65 - 4.0 = 0.65)
                 double procenatOdstupanja = prosecnaJacina - 4.0;
 
-                // Zahtev za novu biljku radi balansa
                 if (!_biljkeServis.ZasadiNovuBiljku("Balansna Biljka", "B. Arome", "Srbija", 3.0))
                 {
                     throw new InvalidOperationException("Neuspešno sađenje balansne biljke.");
                 }
 
-                // Pronalaženje te nove biljke
                 var balansnaBiljka = _biljkeServis.SveBiljke().Last();
 
-                //smanjiti jačinu... na 65% (procenat odstupanja) od vrednosti koju ima
                 if (!_biljkeServis.PromeniJacinuUljaProcentualno(balansnaBiljka.Id.ToString(), procenatOdstupanja))
                 {
                     throw new InvalidOperationException("Neuspešna promena jačine ulja.");
                 }
             }
 
-                // 5. Kreiranje parfema
                 Parfem noviParfem = new Parfem
             {
                 Naziv = nazivParfema,

@@ -12,7 +12,6 @@ namespace Database.Repozitorijumi
 {
     public class DogadjajiRepozitorijum : IDogadjajiRepozitorijum
     {
-        // Ovo će osigurati da se fajl pojavi baš u tom net8.0 folderu koji si otvorila
         private string _putanjaDoFajla = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "loger.txt");
         public DogadjajiRepozitorijum(IBazaPodataka baza)
         {

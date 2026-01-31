@@ -24,13 +24,11 @@ namespace Services
         }
         public bool DodajAmbalazuUSkladiste(Guid skladisteId, int kolicina)
         {
-            // ISPRAVLJENO: Koristimo 'out' da dobijemo stvarni objekat skladišta
             Skladiste skladiste;
             bool postoji = _repo.NadjiPoId(skladisteId, out skladiste);
 
             if (!postoji || skladiste == null) return false;
 
-            // ISPRAVLJENO: Provera kapaciteta direktno na objektu
             if (skladiste.TrenutniBrojAmbalaza + kolicina > skladiste.MaxBrojAmbalaza)
                 return false;
 
@@ -42,11 +40,9 @@ namespace Services
 
         public async Task<bool> PosaljiPaketAsync(Guid ambalazaId)
         {
-            // Umesto Thread.Sleep koristimo Task.Delay jer je metoda 'async'
             await Task.Delay(500);
             return true;
 
-            // Ovde ćeš kasnije dodati logiku, za sada je bitno da naziv odgovara interfejsu
         }
     }
 }

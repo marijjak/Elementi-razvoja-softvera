@@ -10,7 +10,6 @@ namespace Services
 {
     public class SkladisteProvider : ISkladisteProvider
     {
-        // POGLEDAJ OVDE: Dodato 's' u ISkladisniLogistickiServis
         private readonly ISkladisniLogistickiServis _magacin;
         private readonly ISkladisniLogistickiServis _distribucija;
 
