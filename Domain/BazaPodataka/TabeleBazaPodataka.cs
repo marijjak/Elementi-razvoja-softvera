@@ -16,5 +16,7 @@ namespace Domain.BazaPodataka
         //  Add other database tables as needed
         public List<Skladiste> Skladista { get; set; } = new();
         public TabeleBazaPodataka() { }
+
+        public List<FiskalniRacun> FiskalniRacuni { get; set; } = new List<FiskalniRacun>();
     }
 }

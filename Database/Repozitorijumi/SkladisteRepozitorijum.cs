@@ -18,10 +18,22 @@ namespace Database.Repozitorijumi
             _baza = baza;
         }
 
-        public Skladiste NadjiPoId(Guid id)
+        public bool NadjiPoId(Guid id, out Skladiste skladiste)
         {
-            return _baza.Tabele.Skladista.FirstOrDefault(s => s.Id == id);
+            var pronadjeno = _baza.Tabele.Skladista
+                .FirstOrDefault(s => s.Id == id);
+
+            if (pronadjeno == null)
+            {
+                skladiste = null!;
+                return false;
+            }
+
+            skladiste = pronadjeno;
+            return true;
         }
+
+
 
         public void Sacuvaj()
         {

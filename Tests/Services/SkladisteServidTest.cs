@@ -11,8 +11,8 @@ namespace Tests.Services
     [TestFixture]
     public class SkladisteServisTests
     {
-        private Mock<ISkladisteRepozitorijum> _mockRepo;
-        private SkladisteServis _servis;
+        private Mock<ISkladisteRepozitorijum> _mockRepo = null;
+        private SkladisteServis _servis = null!;
 
         [SetUp]
         public void Setup()
@@ -33,8 +33,8 @@ namespace Tests.Services
             };
 
             _mockRepo
-                .Setup(r => r.NadjiPoId(skladiste.Id))
-                .Returns(skladiste);
+        .Setup(r => r.NadjiPoId(skladiste.Id, out skladiste))
+        .Returns(true);
 
             // Act
             var rezultat = _servis.DodajAmbalazuUSkladiste(skladiste.Id, 3);
@@ -58,8 +58,8 @@ namespace Tests.Services
             };
 
             _mockRepo
-                .Setup(r => r.NadjiPoId(skladiste.Id))
-                .Returns(skladiste);
+        .Setup(r => r.NadjiPoId(skladiste.Id, out skladiste))
+        .Returns(true);
 
             // Act
             var rezultat = _servis.DodajAmbalazuUSkladiste(skladiste.Id, 2);

@@ -4,27 +4,32 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System;
-using Domain.Servisi; 
+using Domain.Servisi;
 
 namespace Services
 {
     public class SkladisteProvider : ISkladisteProvider
     {
-        private readonly IMagacinskiCentarServis _magacinServis;
-        private readonly IDistributivniCentarServis _distributivniCentarServis;
+        // POGLEDAJ OVDE: Dodato 's' u ISkladisniLogistickiServis
+        private readonly ISkladisniLogistickiServis _magacin;
+        private readonly ISkladisniLogistickiServis _distribucija;
 
-        public SkladisteProvider(IMagacinskiCentarServis magacin, IDistributivniCentarServis distributivni)
+        public SkladisteProvider(
+            ISkladisniLogistickiServis magacin,
+            ISkladisniLogistickiServis distribucija)
         {
-            _magacinServis = magacin;
-            _distributivniCentarServis = distributivni;
+            _magacin = magacin;
+            _distribucija = distribucija;
         }
 
         public ISkladisniLogistickiServis GetServisPoUlozi(string uloga)
         {
-            if (uloga == "Prodavac") return _magacinServis;
-            if (uloga == "MenadzerProdaje") return _distributivniCentarServis;
+            if (uloga == "MenadzerProdaje")
+            {
+                return _distribucija;
+            }
 
-            throw new Exception("Nemate ovlascenja za ovu akciju.");
+            return _magacin;
         }
     }
 }

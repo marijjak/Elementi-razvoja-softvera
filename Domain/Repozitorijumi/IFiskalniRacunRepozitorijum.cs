@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 
 namespace Domain.Repozitorijumi
 {
-    public interface ISkladisteRepozitorijum
+    public interface IFiskalniRacunRepozitorijum
     {
-        bool NadjiPoId(Guid id, out Skladiste skladiste);
-        void Sacuvaj();
+        bool Dodaj(FiskalniRacun racun);
+
+        IEnumerable<FiskalniRacun> GetSviRacuni();
     }
+
 
 }

@@ -19,10 +19,11 @@ namespace Services
         private readonly IBiljkeServis _biljkeServis;
         private const int ML_PO_BILJCI = 50; // Specifikacija: 1 biljka = 50ml
 
-        public PreradaServis(IBiljkeServis biljkeServis, IPerfumeRepository parfemRepo)
+        public PreradaServis(IBiljkeServis biljkeServis, IPerfumeRepository parfemRepo, IBiljkeRepozitorijum biljkeRepo)
         {
             _biljkeServis = biljkeServis;
             _parfemRepo = parfemRepo;
+            _biljkeRepo = biljkeRepo;
         }
 
         

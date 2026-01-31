@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Domain.BazaPodataka;
+using Domain.Konstante;
+using Domain.Modeli;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Domain.BazaPodataka;
 using System.Text.Json;
-using Domain.Konstante;
+using System.Threading.Tasks;
 
 namespace Database.BazaPodataka
 {
@@ -14,6 +15,7 @@ namespace Database.BazaPodataka
         private const string Putanja = "baza.json";
 
         public TabeleBazaPodataka Tabele { get; set; }
+        public List<FiskalniRacun> FiskalniRacuni { get; set; } = new List<FiskalniRacun>();
 
         public JsonBazaPodataka()
         {

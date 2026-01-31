@@ -43,8 +43,12 @@ namespace Services
 
             foreach (var ambalaza in paketiZaSlanje)
             {
+                // Dodajemo proveru kako bi uklonili CS8602 upozorenje
+                if (ambalaza == null) continue;
+
                 ambalaza.Status = StatusAmbalaze.Poslata;
                 _ambalazaRepo.Azuriraj(ambalaza);
+
                 _dogadjajiServis.Zabelezi(
                     $"Paket {ambalaza.Naziv} je otpremljen iz distributivnog centra za 0.5s.",
                     TipEvidencije.INFO,

@@ -17,6 +17,8 @@ namespace Presentation.Meni
         private readonly IMagacinskiCentarServis _magacinServis;
         private readonly IDistributivniCentarServis _distributivniCentarServis;
         private readonly ISkladisteProvider _skladisteProvider;
+        private readonly IProdajaServis _prodajaServis;
+
 
         private Korisnik _ulogovan;
 
@@ -28,8 +30,10 @@ namespace Presentation.Meni
             IMagacinskiCentarServis magacinServis,
             IDistributivniCentarServis distributivniCentarServis,
             Korisnik ulogovan,
-            ISkladisteProvider skladisteProvider)
+            ISkladisteProvider skladisteProvider,
+            IProdajaServis prodajaServis)
         {
+            _prodajaServis = prodajaServis;
             _authServis = authServis;
             _biljkeServis = biljkeServis;
             _dogadjajiServis = dogadjajiServis;
@@ -181,6 +185,7 @@ namespace Presentation.Meni
                 Console.WriteLine("6. Prerada biljaka u parfeme");
                 Console.WriteLine("7. Upravljanje ambalažom");
                 Console.WriteLine("8. Brza distribucija (Distributivni centar)");
+                Console.WriteLine("9. Pregled fiskalnih računa (Dnevni promet)");
                 Console.WriteLine("0. Nazad");
                 Console.Write("Izbor: ");
 
@@ -217,6 +222,11 @@ namespace Presentation.Meni
                     case "8":
                         ProcesuirajLogistiku().Wait();
                         break;
+
+                    case "9":
+                        PregledRacunaMeni(); 
+                        break;
+
                     case "0":
                         nazad = true;
                         break;
@@ -488,7 +498,7 @@ namespace Presentation.Meni
                 Pauza("Nije moguće ažurirati stanje parfema.");
                 return;
             }
-
+            _dogadjajiServis.Zabelezi($"Prodavac {_ulogovan.ImePrezime} je prodao {kolicina}x {odabrani.Naziv}", TipEvidencije.INFO);
             PrikaziFiskalniRacun(odabrani, kolicina);
         }
 
@@ -497,6 +507,27 @@ namespace Presentation.Meni
             decimal cenaPoBocici = IzracunajCenuPoBocici(parfem);
             decimal ukupno = cenaPoBocici * kolicina;
 
+            var noviRacun = new FiskalniRacun
+            {
+                Id = Guid.NewGuid(),
+                DatumIzdavanja = DateTime.Now,
+                ImeProdavca = _ulogovan.ImePrezime,
+                UkupanIznos = ukupno,
+                TipProdaje = TipProdaje.Maloprodaja, 
+                NacinPlacanja = NacinPlacanja.Gotovina,
+                Stavke = new Dictionary<Guid, int>()
+            };
+            noviRacun.Stavke.Add(parfem.Id, kolicina);
+
+            
+            if (_prodajaServis.DodajNoviRacun(noviRacun))
+            {
+                Console.WriteLine("USPEH: Račun je uspešno sačuvan u bazu!");
+            }
+            else
+            {
+                Console.WriteLine("GREŠKA: Došlo je do problema pri čuvanju računa.");
+            }
             Console.Clear();
             Console.WriteLine("\n===== FISKALNI RAČUN =====");
             Console.WriteLine($"Datum: {DateTime.Now:dd.MM.yyyy HH:mm}");
@@ -744,6 +775,41 @@ namespace Presentation.Meni
             }
         }
 
-  
+
+        private void PregledRacunaMeni()
+        {
+            Console.Clear();
+            Console.WriteLine("\n===== PREGLED FISKALNIH RAČUNA (Dnevni promet) =====");
+
+            // Pozivamo tvoju metodu iz interfejsa koristeći 'out'
+            // Šaljemo današnji datum: DateTime.Now
+
+            bool uspeh = _prodajaServis.PokusajDobaviRacuneZaDan(_ulogovan, DateTime.Now, out List<FiskalniRacun> racuni);
+
+           
+
+            if (uspeh && racuni != null && racuni.Count > 0)
+            {
+                Console.WriteLine($"{"ID Računa",-38} | {"Iznos",-12} | {"Datum i vreme"}");
+                Console.WriteLine(new string('-', 75));
+
+                foreach (var r in racuni)
+                {
+                    // Koristimo UkupnaCena ili naziv svojstva koji imaš u FiskalniRacun
+                    Console.WriteLine($"{r.Id,-38} | {r.UkupanIznos,8:N2} RSD | {r.DatumIzdavanja:dd.MM.yyyy HH:mm}");
+                }
+
+                Console.WriteLine(new string('-', 75));
+                Console.WriteLine($"UKUPAN PROMET: {racuni.Sum(r => r.UkupanIznos):N2} RSD");
+            }
+            else
+            {
+                // Ova grana se izvršava ako metoda vrati 'false' (nema računa)
+                Console.WriteLine("Trenutno nema izdatih računa za današnji dan.");
+            }
+
+            Pauza("\nKraj izveštaja.");
+        }
+
     }
 }

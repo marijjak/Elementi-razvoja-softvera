@@ -19,7 +19,9 @@ namespace Tests
         private Mock<IPerfumeRepository> _parfemRepoMock = null;
         private Mock<IDogadjajiServis> _dogadjajiMock = null;
         private Mock<IBiljkeServis> _biljkeServisMock = null!;
+        private Mock<IBiljkeRepozitorijum> _biljkeRepoMock = null;
         private PreradaServis _servis = null;
+
 
 
         [SetUp]
@@ -29,10 +31,14 @@ namespace Tests
             _parfemRepoMock = new Mock<IPerfumeRepository>();
             _dogadjajiMock = new Mock<IDogadjajiServis>();
             _biljkeServisMock = new Mock<IBiljkeServis>();
-
+            _biljkeRepoMock = new Mock<IBiljkeRepozitorijum>();
             // Inicijalizujemo servis sa tim lažnim podacima
 
-            _servis = new PreradaServis(_biljkeServisMock.Object, _parfemRepoMock.Object);
+            _servis = new PreradaServis(
+            _biljkeServisMock.Object,
+            _parfemRepoMock.Object,
+            _biljkeRepoMock.Object
+            );
         }
 
         public void NapraviParfem_ValidniPodaci_IspravnaKalkulacijaKolicine()

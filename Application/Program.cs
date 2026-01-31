@@ -1,5 +1,6 @@
 ﻿using Database.BazaPodataka;
 using Database.Repozitorijumi;
+using Database.Repozitorijumi.Database.Repozitorijumi;
 using Domain.BazaPodataka;
 using Domain.Enumeracije;
 using Domain.Modeli;
@@ -14,10 +15,12 @@ namespace Loger_Bloger
 {
     public class Program
     {
+
         public static void Main()
         {
             // Baza podataka - JSON implementacija
             IBazaPodataka bazaPodataka = new JsonBazaPodataka();
+            ILoggerServis loggerServis = new LoggerServis();
 
             // Repozitorijumi
             IKorisniciRepozitorijum korisniciRepozitorijum = new KorisniciRepozitorijum(bazaPodataka);
@@ -26,7 +29,7 @@ namespace Loger_Bloger
             IPerfumeRepository perfumeRepo = new PerfumeRepository(bazaPodataka);
             IAmbalazaRepozitorijum ambalazaRepozitorijum = new AmbalazaRepozitorijum(bazaPodataka);
             ISkladisteRepozitorijum skladisteRepozitorijum = new SkladisteRepozitorijum(bazaPodataka);
-
+            IFiskalniRacunRepozitorijum prodajaRepo = new FiskalniRacunRepozitorijum(bazaPodataka);
             if (!bazaPodataka.Tabele.Skladista.Any())
             {
                 Guid pocetnoSkladisteId = Guid.Parse("3f2504e0-4f89-11d3-9a0c-0305e82c3301");
@@ -53,14 +56,17 @@ namespace Loger_Bloger
             IAutentifikacijaServis autentifikacijaServis = new AutentifikacioniServis(korisniciRepozitorijum);
             IDogadjajiServis dogadjajiServis = new DogadjajiServis(dogadjajiRepozitorijum);
             IBiljkeServis biljkeServis = new BiljkeServis(biljkeRepozitorijum, dogadjajiServis);
-            IPreradaServis preradaServis = new PreradaServis(biljkeServis, perfumeRepo);
+            IPreradaServis preradaServis = new PreradaServis(biljkeServis, perfumeRepo, biljkeRepozitorijum);
             ISkladisteServis skladisteServis = new SkladisteServis(skladisteRepozitorijum);
             IAmbalazaServis ambalazaServis = new AmbalazaServis(ambalazaRepozitorijum, dogadjajiServis, perfumeRepo, skladisteServis);
+            // Umesto direktnog kreiranja, koristi interfejs ako je moguće
+            // Dodaj slovo 's' (ISkladisniLogistickiServis)
+            ISkladisniLogistickiServis magacinServis = new MagacinskiCentarServis(ambalazaRepozitorijum, dogadjajiServis);
+            ISkladisniLogistickiServis distributivniCentarServis = new DistributivniCentarServis(ambalazaRepozitorijum, dogadjajiServis);
 
-            MagacinskiCentarServis magacinServis = new MagacinskiCentarServis(ambalazaRepozitorijum, dogadjajiServis);
-            DistributivniCentarServis distributivniCentarServis = new DistributivniCentarServis(ambalazaRepozitorijum, dogadjajiServis);
+            
+            IProdajaServis prodajaServis = new ProdajaServis(prodajaRepo, loggerServis, dogadjajiServis);
             ISkladisteProvider skladisteProvider = new SkladisteProvider(magacinServis, distributivniCentarServis);
-          
             if (korisniciRepozitorijum.SviKorisnici().Count() == 0)
             {
               
@@ -152,18 +158,19 @@ namespace Loger_Bloger
             Console.WriteLine("Pritisnite bilo koji taster za nastavak...");
             Console.ReadKey();
 
-      
+
             OpcijeMeni meni = new OpcijeMeni(
                 autentifikacijaServis,
-                biljkeServis, 
+                biljkeServis,
                 dogadjajiServis,
                 preradaServis,
                 perfumeRepo,
                 ambalazaServis,
-                magacinServis,
-                distributivniCentarServis,
+                (MagacinskiCentarServis)magacinServis,
+                (DistributivniCentarServis)distributivniCentarServis,
                 prijavljen,
-                skladisteProvider
+                skladisteProvider,
+                prodajaServis
             );
             meni.PrikaziGlavniMeni();
         }

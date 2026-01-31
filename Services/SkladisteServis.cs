@@ -1,6 +1,7 @@
-﻿using Domain.Repozitorijumi;
-using Domain.Servisi;
+﻿using Domain.Modeli;
 using Domain.PomocneMetode;
+using Domain.Repozitorijumi;
+using Domain.Servisi;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,17 +20,21 @@ namespace Services
         }
         public bool PostojiSkladiste(Guid skladisteId)
         {
-            return _repo.NadjiPoId(skladisteId) != null;
+            return _repo.NadjiPoId(skladisteId, out Skladiste _);
         }
         public bool DodajAmbalazuUSkladiste(Guid skladisteId, int kolicina)
         {
-            var skladiste = _repo.NadjiPoId(skladisteId);
-            if (skladiste == null) return false;
+            // ISPRAVLJENO: Koristimo 'out' da dobijemo stvarni objekat skladišta
+            Skladiste skladiste;
+            bool postoji = _repo.NadjiPoId(skladisteId, out skladiste);
 
-            if (!skladiste.ImaMesta(kolicina))
-                return false; 
+            if (!postoji || skladiste == null) return false;
 
-            skladiste.DodajAmbalazu(kolicina);
+            // ISPRAVLJENO: Provera kapaciteta direktno na objektu
+            if (skladiste.TrenutniBrojAmbalaza + kolicina > skladiste.MaxBrojAmbalaza)
+                return false;
+
+            skladiste.TrenutniBrojAmbalaza += kolicina;
             _repo.Sacuvaj();
 
             return true;
