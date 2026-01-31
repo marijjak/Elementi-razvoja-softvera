@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Services
 {
-    public class DistributivniCentarServis : IDistributivniCentarServis, ISkladisniLogistickiServis
+    public class DistributivniCentarServis : IDistributivniCentarServis, ISkladisniLogistickiServis, ISkladisteServis
     {
         private readonly IAmbalazaRepozitorijum _ambalazaRepo;
         private readonly IDogadjajiServis _dogadjajiServis;
@@ -63,6 +63,18 @@ namespace Services
             var rezultat = await PosaljiPaketeAsync(new List<Guid> { ambalazaId });
             return rezultat > 0;
         }
+
+        public bool PostojiSkladiste(Guid skladisteId) => true;
+        public bool DodajAmbalazuUSkladiste(Guid skladisteId, int kolicina) => true;
+
+
+        // Ova metoda MORA postojati da bi interfejs ISkladisteServis bio zadovoljen
+        public async Task<bool> PosaljiPaketAsync(Guid ambalazaId)
+        {
+            // Samo preusmeravamo poziv na tvoju postojeću metodu ProcesuirajIsporukuAsync
+            return await ProcesuirajIsporukuAsync(ambalazaId);
+        }
     }
+
 }
 

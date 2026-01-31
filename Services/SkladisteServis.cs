@@ -39,5 +39,14 @@ namespace Services
 
             return true;
         }
+
+        public async Task<bool> PosaljiPaketAsync(Guid ambalazaId)
+        {
+            // Umesto Thread.Sleep koristimo Task.Delay jer je metoda 'async'
+            await Task.Delay(500);
+            return true;
+
+            // Ovde ćeš kasnije dodati logiku, za sada je bitno da naziv odgovara interfejsu
+        }
     }
 }

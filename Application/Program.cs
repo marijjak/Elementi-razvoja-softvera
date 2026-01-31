@@ -64,8 +64,16 @@ namespace Loger_Bloger
             ISkladisniLogistickiServis magacinServis = new MagacinskiCentarServis(ambalazaRepozitorijum, dogadjajiServis);
             ISkladisniLogistickiServis distributivniCentarServis = new DistributivniCentarServis(ambalazaRepozitorijum, dogadjajiServis);
 
-            
-            IProdajaServis prodajaServis = new ProdajaServis(prodajaRepo, loggerServis, dogadjajiServis);
+
+            // Izmeni liniju 58 u Program.cs:
+            IProdajaServis prodajaServis = new ProdajaServis(
+                prodajaRepo,
+                loggerServis,
+                dogadjajiServis,
+                (ISkladisteServis)distributivniCentarServis, // Kastujemo jer ProdajaServis traži ISkladisteServis
+                (ISkladisteServis)magacinServis,
+                ambalazaRepozitorijum // Ovo je onaj parametar koji ti je falio i zbog kog se crvenelo
+            );
             ISkladisteProvider skladisteProvider = new SkladisteProvider(magacinServis, distributivniCentarServis);
             if (korisniciRepozitorijum.SviKorisnici().Count() == 0)
             {

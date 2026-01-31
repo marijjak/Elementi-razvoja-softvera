@@ -9,7 +9,7 @@ using Domain.Enumeracije;
 
 namespace Services
 {
-    public class MagacinskiCentarServis : IMagacinskiCentarServis, ISkladisniLogistickiServis
+    public class MagacinskiCentarServis : IMagacinskiCentarServis, ISkladisniLogistickiServis, ISkladisteServis
     {
         private readonly IAmbalazaRepozitorijum _ambalazaRepo;
         private readonly IDogadjajiServis _dogadjajiServis;
@@ -37,5 +37,19 @@ namespace Services
         }
         public async Task<bool> ProcesuirajIsporukuAsync(Guid ambalazaId)
         => await PosaljiPaketAsync(ambalazaId);
+
+        // Ove metode su neophodne da bi ispoštovao ISkladisteServis
+
+        public bool PostojiSkladiste(Guid skladisteId)
+        {
+            // Možeš vratiti true ili dodati pravu proveru ako je potrebno
+            return true;
+        }
+
+        public bool DodajAmbalazuUSkladiste(Guid skladisteId, int kolicina)
+        {
+            // Privremena implementacija da bi se kod kompajlirao
+            return true;
+        }
     }
 }

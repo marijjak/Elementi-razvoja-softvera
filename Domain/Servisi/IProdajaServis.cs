@@ -14,7 +14,7 @@ namespace Domain.Servisi
             Korisnik korisnik,
             DateTime datum,
             out List<FiskalniRacun> racuniZaDan);
-        bool DodajNoviRacun(FiskalniRacun racun);
+        Task<bool> DodajNoviRacunAsync(FiskalniRacun racun);
     }
 
 }

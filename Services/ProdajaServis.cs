@@ -16,14 +16,26 @@ namespace Services
         private readonly IFiskalniRacunRepozitorijum _racunRepo;
         private readonly ILoggerServis _logger;
         private readonly IDogadjajiServis _dogadjaji;
+        private readonly ISkladisteServis _distributivniCentar;
+        private readonly ISkladisteServis _magacinskiCentar;
+        private readonly IAmbalazaRepozitorijum _ambalazaRepo;
+
+        // Obrisani duplikati IMagacinskiCentar i IDistributivniCentar koji su pravili greške CS0102
 
         public ProdajaServis(
             IFiskalniRacunRepozitorijum racunRepo,
-            ILoggerServis logger, IDogadjajiServis dogadjaji)
+            ILoggerServis logger,
+            IDogadjajiServis dogadjaji,
+            ISkladisteServis distributivniCentar,
+            ISkladisteServis magacinskiCentar,
+            IAmbalazaRepozitorijum ambalazaRepo)
         {
             _racunRepo = racunRepo;
             _logger = logger;
             _dogadjaji = dogadjaji;
+            _distributivniCentar = distributivniCentar;
+            _magacinskiCentar = magacinskiCentar;
+            _ambalazaRepo = ambalazaRepo;
         }
 
         public IEnumerable<FiskalniRacun> VidiSveRacune(Korisnik korisnik)
@@ -38,47 +50,45 @@ namespace Services
             return _racunRepo.GetSviRacuni();
         }
 
-        public bool PokusajDobaviRacuneZaDan(
-            Korisnik korisnik,
-            DateTime datum,
-            out List<FiskalniRacun> racuniZaDan)
+        public bool PokusajDobaviRacuneZaDan(Korisnik korisnik, DateTime datum, out List<FiskalniRacun> racuniZaDan)
         {
             racuniZaDan = new List<FiskalniRacun>();
 
-            // PROVERA POZIVA (kako si tražila)
             if (!RacunPomocneMetode.DaLiJeMenadzer(korisnik))
             {
-                _logger.EvidentirajDogadjaj(
-                    TipEvidencije.WARNING,
-                    "Neovlascen pokusaj pristupa fiskalnim racunima.");
-
+                _logger.EvidentirajDogadjaj(TipEvidencije.WARNING, "Neovlascen pokusaj pristupa fiskalnim racunima.");
                 return false;
             }
 
             var sviRacuni = _racunRepo.GetSviRacuni().ToList();
+            racuniZaDan = RacunPomocneMetode.FiltrirajPoDatumu(sviRacuni, datum);
 
-
-            racuniZaDan = RacunPomocneMetode
-                .FiltrirajPoDatumu(sviRacuni, datum);
-
-            _logger.EvidentirajDogadjaj(
-                TipEvidencije.INFO,
-                $"Menadzer je dobavio racune za datum {datum.ToShortDateString()}.");
+            _logger.EvidentirajDogadjaj(TipEvidencije.INFO, $"Menadzer je dobavio racune za datum {datum.ToShortDateString()}.");
 
             return true;
         }
 
-        public bool DodajNoviRacun(FiskalniRacun racun)
+        // ISPRAVLJENO: Uklonjen parametar 'Korisnik ulogovan' da bi odgovaralo interfejsu
+        public async Task<bool> DodajNoviRacunAsync(FiskalniRacun racun)
         {
-            // Pozivamo 'Dodaj' jer se tako zove u tvom repozitorijumu
-            bool uspeh = _racunRepo.Dodaj(racun);
+            // Koristimo podatak o korisniku iz samog objekta računa ili statičkog konteksta ako postoji
+            // Ovde pretpostavljam da račun ima informaciju o tome ko ga je izdao
+            ISkladisteServis trenutnoSkladiste = _magacinskiCentar;
 
-            if (uspeh)
+            var dostupnaAmbalaza = _ambalazaRepo.Sve().FirstOrDefault(a => a.Status == StatusAmbalaze.Spakovana);
+
+            if (dostupnaAmbalaza == null)
             {
-                _dogadjaji.Zabelezi($"Prodat račun: {racun.UkupanIznos} RSD", TipEvidencije.INFO);
+                _dogadjaji.Zabelezi("Nema dostupne ambalaže u skladištu!", TipEvidencije.ERROR);
+                return false;
             }
-            return uspeh;
+
+            // Pozivamo asinkronu metodu iz skladišta koju smo ranije popravili
+            bool uspehSkladiste = await trenutnoSkladiste.PosaljiPaketAsync(dostupnaAmbalaza.Id);
+
+            if (!uspehSkladiste) return false;
+
+            return _racunRepo.Dodaj(racun);
         }
     }
-
 }

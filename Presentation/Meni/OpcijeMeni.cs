@@ -498,11 +498,12 @@ namespace Presentation.Meni
                 Pauza("Nije moguće ažurirati stanje parfema.");
                 return;
             }
+            // Pronađi ovu liniju u InteraktivniProdajniKatalog i dodaj await .Wait() ili je prebaci u async
             _dogadjajiServis.Zabelezi($"Prodavac {_ulogovan.ImePrezime} je prodao {kolicina}x {odabrani.Naziv}", TipEvidencije.INFO);
-            PrikaziFiskalniRacun(odabrani, kolicina);
+            PrikaziFiskalniRacun(odabrani, kolicina).Wait(); // Dodaj .Wait() jer je metoda postala Task
         }
 
-        private void PrikaziFiskalniRacun(Parfem parfem, int kolicina)
+        private async Task PrikaziFiskalniRacun(Parfem parfem, int kolicina)
         {
             decimal cenaPoBocici = IzracunajCenuPoBocici(parfem);
             decimal ukupno = cenaPoBocici * kolicina;
@@ -513,14 +514,14 @@ namespace Presentation.Meni
                 DatumIzdavanja = DateTime.Now,
                 ImeProdavca = _ulogovan.ImePrezime,
                 UkupanIznos = ukupno,
-                TipProdaje = TipProdaje.Maloprodaja, 
+                TipProdaje = TipProdaje.Maloprodaja,
                 NacinPlacanja = NacinPlacanja.Gotovina,
                 Stavke = new Dictionary<Guid, int>()
             };
             noviRacun.Stavke.Add(parfem.Id, kolicina);
 
-            
-            if (_prodajaServis.DodajNoviRacun(noviRacun))
+            // FIX: Dodat await i ispravljen poziv prema novom interfejsu
+            if (await _prodajaServis.DodajNoviRacunAsync(noviRacun))
             {
                 Console.WriteLine("USPEH: Račun je uspešno sačuvan u bazu!");
             }
@@ -528,6 +529,7 @@ namespace Presentation.Meni
             {
                 Console.WriteLine("GREŠKA: Došlo je do problema pri čuvanju računa.");
             }
+
             Console.Clear();
             Console.WriteLine("\n===== FISKALNI RAČUN =====");
             Console.WriteLine($"Datum: {DateTime.Now:dd.MM.yyyy HH:mm}");
