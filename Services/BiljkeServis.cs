@@ -24,10 +24,21 @@ namespace Services
 
         public Biljka DodajBiljku(Biljka biljka)
         {
-            if (biljka.JacinaArome < 1 || biljka.JacinaArome > 5)
-                throw new Exception("Jačina arome mora biti između 1 i 5.");
+            try
+            {
+                if (biljka.JacinaArome < 1 || biljka.JacinaArome > 5)
+                {
+                    _dogadjajiServis.Zabelezi("Jačina arome mora biti između 1 i 5.", TipEvidencije.WARNING);
+                    return null;
+                }
 
-            return _repo.Dodaj(biljka);
+                return _repo.Dodaj(biljka);
+            }
+            catch (Exception ex)
+            {
+                _dogadjajiServis.Zabelezi($"Greška pri dodavanju biljke: {ex.Message}", TipEvidencije.ERROR);
+                return null;
+            }
         }
 
 

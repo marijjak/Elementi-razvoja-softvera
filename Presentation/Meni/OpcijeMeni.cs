@@ -683,6 +683,12 @@ namespace Presentation.Meni
             {
                 var ambalaza = _ambalazaServis.KreirajAmbalazu(naziv, adresa, skladisteId, parfemIds);
                 Pauza($"Ambalaža kreirana! ID: {ambalaza.Id}");
+                if (ambalaza == null)
+                {
+                    Pauza("Greška pri kreiranju ambalaže.");
+                    return;
+                }
+
             }
             catch (Exception ex)
             {
@@ -738,9 +744,9 @@ namespace Presentation.Meni
                 return;
             }
 
-            var zauzetiParfemi = ambalaze.SelectMany(a => a.ParfemIds).ToHashSet();
+          
             var dostupniParfemi = _parfemRepo.Svi()
-                .Where(p => !zauzetiParfemi.Contains(p.Id))
+              .Where(p => p.KolicinaNaStanju > 0)
                 .ToList();
 
             if (!dostupniParfemi.Any())
@@ -766,6 +772,11 @@ namespace Presentation.Meni
             try
             {
                 var ambalaza = _ambalazaServis.DodajParfemeUAmbalazu(ambalazaId, parfemIds);
+                if (ambalaza == null)
+                {
+                    Pauza("Greška pri dodavanju parfema u ambalažu.");
+                    return;
+                }
                 Pauza($"Uspešno dodati parfemi u ambalažu '{ambalaza.Naziv}'.");
             }
             catch (Exception ex)

@@ -1,14 +1,14 @@
-﻿using Domain.Enumeracije;
-using Domain.Modeli;
-using Domain.Repozitorijumi;
-using Domain.Servisi;
-using Domain.PomocneMetode;
-using Domain.Konstante;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Enumeracije;
+using Domain.Konstante;
+using Domain.Modeli;
+using Domain.PomocneMetode;
+using Domain.Repozitorijumi;
+using Domain.Servisi;
 
 namespace Services
 {
@@ -26,82 +26,91 @@ namespace Services
             _biljkeRepo = biljkeRepo;
         }
 
-        
+
         public Parfem NapraviParfem(string nazivParfema, int brojBocica, int zapreminaBociceMl, string tipParfema)
         {
-            if (zapreminaBociceMl != 150 && zapreminaBociceMl != 250)
-                throw new Exception("Zapremina bočice mora biti 150 ili 250 ml.");
-
-            int ukupnoMl = brojBocica * zapreminaBociceMl;
-            int potrebneBiljke = (int)Math.Ceiling((double)ukupnoMl / KONSTANTE.MlPoBiljci);
-
-            var ubraneBiljke = _biljkeServis.SveBiljke()
-                .Where(b => b.Stanje == StanjeBiljke.Ubrana)
-                .Take(potrebneBiljke)
-                .ToList();
-
-            while (ubraneBiljke.Count < potrebneBiljke)
+            try
             {
-                double nasumicnaJacina = new Random().NextDouble() * (5.0 - 1.0) + 1.0;
-
-                if (!_biljkeServis.ZasadiNovuBiljku("Naknadno zasadjena", "L. Nova", "Srbija", nasumicnaJacina))
+                if (zapreminaBociceMl != 150 && zapreminaBociceMl != 250)
                 {
-                    throw new InvalidOperationException("Neuspešno sađenje biljke.");
-                }
-                var novaBiljka = _biljkeServis.SveBiljke().Last();
-                if (!_biljkeServis.OznaciBiljkuKaoUbranu(novaBiljka.Id))
-                {
-                    throw new InvalidOperationException("Neuspešno označavanje biljke kao ubrane.");
+                    return null;
                 }
 
-                ubraneBiljke.Add(novaBiljka);
-            }
+                int ukupnoMl = brojBocica * zapreminaBociceMl;
+                int potrebneBiljke = (int)Math.Ceiling((double)ukupnoMl / KONSTANTE.MlPoBiljci);
 
-            foreach (var biljka in ubraneBiljke)
-            {
-                if (!BiljkaPomocne.PromeniStanje(biljka, StanjeBiljke.Preradjena))
+                var ubraneBiljke = _biljkeServis.SveBiljke()
+                    .Where(b => b.Stanje == StanjeBiljke.Ubrana)
+                    .Take(potrebneBiljke)
+                    .ToList();
+
+                while (ubraneBiljke.Count < potrebneBiljke)
                 {
-                    throw new InvalidOperationException("Neuspešna promena stanja biljke.");
+                    double nasumicnaJacina = new Random().NextDouble() * (5.0 - 1.0) + 1.0;
+
+                    if (!_biljkeServis.ZasadiNovuBiljku("Naknadno zasadjena", "L. Nova", "Srbija", nasumicnaJacina))
+                    {
+                        return null;
+                    }
+                    var novaBiljka = _biljkeServis.SveBiljke().Last();
+                    if (!_biljkeServis.OznaciBiljkuKaoUbranu(novaBiljka.Id))
+                    {
+                        return null;
+                    }
+
+                    ubraneBiljke.Add(novaBiljka);
                 }
-                _biljkeServis.DodajBiljku(biljka);
-            }
 
-            double prosecnaJacina = ubraneBiljke.Average(b => b.JacinaArome);
-
-            if (prosecnaJacina > 4.0)
-            {
-                double procenatOdstupanja = prosecnaJacina - 4.0;
-
-                if (!_biljkeServis.ZasadiNovuBiljku("Balansna Biljka", "B. Arome", "Srbija", 3.0))
+                foreach (var biljka in ubraneBiljke)
                 {
-                    throw new InvalidOperationException("Neuspešno sađenje balansne biljke.");
+                    if (!BiljkaPomocne.PromeniStanje(biljka, StanjeBiljke.Preradjena))
+                    {
+                        return null;
+                    }
+                    _biljkeServis.DodajBiljku(biljka);
                 }
 
-                var balansnaBiljka = _biljkeServis.SveBiljke().Last();
+                double prosecnaJacina = ubraneBiljke.Average(b => b.JacinaArome);
 
-                if (!_biljkeServis.PromeniJacinuUljaProcentualno(balansnaBiljka.Id.ToString(), procenatOdstupanja))
+                if (prosecnaJacina > 4.0)
                 {
-                    throw new InvalidOperationException("Neuspešna promena jačine ulja.");
+                    double procenatOdstupanja = prosecnaJacina - 4.0;
+
+                    if (!_biljkeServis.ZasadiNovuBiljku("Balansna Biljka", "B. Arome", "Srbija", 3.0))
+                    {
+                        return null;
+                    }
+
+                    var balansnaBiljka = _biljkeServis.SveBiljke().Last();
+
+                    if (!_biljkeServis.PromeniJacinuUljaProcentualno(balansnaBiljka.Id.ToString(), procenatOdstupanja))
+                    {
+                        return null;
+                    }
                 }
-            }
 
                 Parfem noviParfem = new Parfem
-            {
-                Naziv = nazivParfema,
-                TipParfema = tipParfema,
-                BrojBocica = brojBocica,
-                ZapreminaBociceMl = zapreminaBociceMl,
-                UkupnaKolicinaMl = ukupnoMl,
-                KolicinaNaStanju = brojBocica
-            };
+                {
+                    Naziv = nazivParfema,
+                    TipParfema = tipParfema,
+                    BrojBocica = brojBocica,
+                    ZapreminaBociceMl = zapreminaBociceMl,
+                    UkupnaKolicinaMl = ukupnoMl,
+                    KolicinaNaStanju = brojBocica
+                };
 
-            if (!PomocneParfem.GenerisiSerijskiBroj(noviParfem))
-            {
-                throw new InvalidOperationException("Neuspešno generisanje serijskog broja.");
+                if (!PomocneParfem.GenerisiSerijskiBroj(noviParfem))
+                {
+                    return null;
+                }
+                _parfemRepo.Dodaj(noviParfem);
+
+                return noviParfem;
             }
-            _parfemRepo.Dodaj(noviParfem);
-
-            return noviParfem;
+            catch
+            {
+                return null;
+            }
         }
 
         public bool ImaDovoljnoBiljaka(int ukupnoMl)

@@ -14,6 +14,7 @@ namespace Services
     public class ProdajaServis : IProdajaServis
     {
         private readonly IFiskalniRacunRepozitorijum _racunRepo;
+
         private readonly ILoggerServis _logger;
         private readonly IDogadjajiServis _dogadjaji;
         private readonly ISkladisteServis _distributivniCentar;
@@ -39,14 +40,22 @@ namespace Services
 
         public IEnumerable<FiskalniRacun> VidiSveRacune(Korisnik korisnik)
         {
-            if (korisnik.Uloga != TipKorisnika.MenadzerProdaje)
+            try
             {
-                _dogadjaji.Zabelezi($"Neovlašćen pokušaj pristupa računima: {korisnik.KorisnickoIme}", TipEvidencije.WARNING);
-                throw new UnauthorizedAccessException("Samo menadžer može videti račune.");
-            }
+                if (korisnik.Uloga != TipKorisnika.MenadzerProdaje)
+                {
+                    _dogadjaji.Zabelezi($"Neovlašćen pokušaj pristupa računima: {korisnik.KorisnickoIme}", TipEvidencije.WARNING);
+                    return Enumerable.Empty<FiskalniRacun>();
+                }
 
-            _dogadjaji.Zabelezi($"Menadžer {korisnik.ImePrezime} je pregledao dnevni promet.", TipEvidencije.INFO);
-            return _racunRepo.GetSviRacuni();
+                _dogadjaji.Zabelezi($"Menadžer {korisnik.ImePrezime} je pregledao dnevni promet.", TipEvidencije.INFO);
+                return _racunRepo.GetSviRacuni();
+            }
+            catch (Exception ex)
+            {
+                _dogadjaji.Zabelezi($"Greška pri pregledu računa: {ex.Message}", TipEvidencije.ERROR);
+                return Enumerable.Empty<FiskalniRacun>();
+            }
         }
 
         public bool PokusajDobaviRacuneZaDan(Korisnik korisnik, DateTime datum, out List<FiskalniRacun> racuniZaDan)
@@ -69,22 +78,29 @@ namespace Services
 
         public async Task<bool> DodajNoviRacunAsync(FiskalniRacun racun)
         {
-  
-            ISkladisteServis trenutnoSkladiste = _magacinskiCentar;
-
-            var dostupnaAmbalaza = _ambalazaRepo.Sve().FirstOrDefault(a => a.Status == StatusAmbalaze.Spakovana);
-
-            if (dostupnaAmbalaza == null)
+            try
             {
-                _dogadjaji.Zabelezi("Nema dostupne ambalaže u skladištu!", TipEvidencije.ERROR);
+                ISkladisteServis trenutnoSkladiste = _magacinskiCentar;
+
+                var dostupnaAmbalaza = _ambalazaRepo.Sve().FirstOrDefault(a => a.Status == StatusAmbalaze.Spakovana);
+
+                if (dostupnaAmbalaza == null)
+                {
+                    _dogadjaji.Zabelezi("Nema dostupne ambalaže u skladištu!", TipEvidencije.ERROR);
+                    return false;
+                }
+
+                bool uspehSkladiste = await trenutnoSkladiste.PosaljiPaketAsync(dostupnaAmbalaza.Id);
+
+                if (!uspehSkladiste) return false;
+
+                return _racunRepo.Dodaj(racun);
+            }
+            catch (Exception ex)
+            {
+                _dogadjaji.Zabelezi($"Greška pri dodavanju fiskalnog računa: {ex.Message}", TipEvidencije.ERROR);
                 return false;
             }
-
-            bool uspehSkladiste = await trenutnoSkladiste.PosaljiPaketAsync(dostupnaAmbalaza.Id);
-
-            if (!uspehSkladiste) return false;
-
-            return _racunRepo.Dodaj(racun);
         }
     }
 }

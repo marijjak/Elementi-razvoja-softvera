@@ -33,7 +33,7 @@ namespace Services
                 return false;
 
             skladiste.TrenutniBrojAmbalaza += kolicina;
-            _repo.Sacuvaj();
+            _repo.Sacuvaj(); //check
 
             return true;
         }
