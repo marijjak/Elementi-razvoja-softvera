@@ -9,7 +9,7 @@ namespace Domain.Servisi
 {
     public interface IBiljkeServis
     {
-        Biljka DodajBiljku(Biljka biljka);
+        bool DodajBiljku(Biljka biljka);
         bool OznaciBiljkuKaoUbranu(Guid id);
         bool PromeniStanje(Guid biljkaId);
         IEnumerable<Biljka> SveBiljke();

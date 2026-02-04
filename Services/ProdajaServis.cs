@@ -1,4 +1,5 @@
 ﻿using Domain.Enumeracije;
+using Domain.Konstante;
 using Domain.Modeli;
 using Domain.PomocneMetode;
 using Domain.Repozitorijumi;
@@ -86,8 +87,35 @@ namespace Services
 
                 if (dostupnaAmbalaza == null)
                 {
-                    _dogadjaji.Zabelezi("Nema dostupne ambalaže u skladištu!", TipEvidencije.ERROR);
-                    return false;
+                    var zauzetiParfemi = _ambalazaRepo.Sve()
+                      .SelectMany(a => a.ParfemIds)
+                      .ToHashSet();
+
+                    var parfemIds = racun.Stavke
+                        .SelectMany(s => Enumerable.Repeat(s.Key, s.Value))
+                        .ToList();
+
+                    if (parfemIds.Any(id => zauzetiParfemi.Contains(id)))
+                    {
+                        _dogadjaji.Zabelezi("Parfem već postoji u drugoj ambalaži.", TipEvidencije.ERROR);
+                        return false;
+                    }
+
+                    dostupnaAmbalaza = new Ambalaza
+                    {
+                        Naziv = "Automatska ambalaža",
+                        AdresaPosiljaoca = "O'Sinjel De Or, Paris",
+                        SkladisteId = Guid.Parse(KONSTANTE.DefaultSkladisteId),
+                        ParfemIds = parfemIds,
+                        Status = StatusAmbalaze.Spakovana
+                    };
+
+                    if (_ambalazaRepo.Dodaj(dostupnaAmbalaza) == null)
+                    {
+                        _dogadjaji.Zabelezi("Nije moguće kreirati novu ambalažu.", TipEvidencije.ERROR);
+                        return false;
+                    }
+                    _dogadjaji.Zabelezi("Kreirana je nova ambalaža za prodaju.", TipEvidencije.INFO, dostupnaAmbalaza.Id);
                 }
 
                 bool uspehSkladiste = await trenutnoSkladiste.PosaljiPaketAsync(dostupnaAmbalaza.Id);

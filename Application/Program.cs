@@ -1,8 +1,8 @@
 ﻿using Database.BazaPodataka;
 using Database.Repozitorijumi;
-using Database.Repozitorijumi.Database.Repozitorijumi;
 using Domain.BazaPodataka;
 using Domain.Enumeracije;
+using Domain.Konstante;
 using Domain.Modeli;
 using Domain.Repozitorijumi;
 using Domain.Servisi;
@@ -32,11 +32,11 @@ namespace Loger_Bloger
             IFiskalniRacunRepozitorijum prodajaRepo = new FiskalniRacunRepozitorijum(bazaPodataka);
             if (!bazaPodataka.Tabele.Skladista.Any())
             {
-                Guid pocetnoSkladisteId = Guid.Parse("3f2504e0-4f89-11d3-9a0c-0305e82c3301");
-                var pocetnoSkladiste = new Skladiste
+                Guid pocetnoSkladisteId = Guid.Parse(KONSTANTE.DefaultSkladisteId); var pocetnoSkladiste = new Skladiste
                 {
                     Id = pocetnoSkladisteId,
                     Naziv = "Glavno skladište",
+                    Lokacija = "Paris",
                     MaxBrojAmbalaza = 100,
                     TrenutniBrojAmbalaza = 0
                 };
@@ -48,7 +48,7 @@ namespace Loger_Bloger
             // TODO: Dodati ostale repozitorijume 
             if (!biljkeRepozitorijum.ObrisiPrazne())
             {
-                Console.WriteLine("Upozorenje: čišćenje praznih biljaka nije uspelo.");
+                Console.WriteLine("Upozorenje: Čišćenje praznih biljaka nije uspelo.");
             }
            
 
@@ -101,7 +101,9 @@ namespace Loger_Bloger
                 Console.WriteLine();
             }
 
+
            
+
             AutentifikacioniMeni am = new AutentifikacioniMeni(autentifikacijaServis);
             Korisnik prijavljen = new Korisnik();
 

@@ -29,13 +29,10 @@ namespace Services
 
             if (!postoji || skladiste == null) return false;
 
-            if (skladiste.TrenutniBrojAmbalaza + kolicina > skladiste.MaxBrojAmbalaza)
+            if (!SkladistePomocne.DodajAmbalazu(skladiste, kolicina))
                 return false;
 
-            skladiste.TrenutniBrojAmbalaza += kolicina;
-            _repo.Sacuvaj(); //check
-
-            return true;
+            return _repo.Sacuvaj();
         }
 
         public async Task<bool> PosaljiPaketAsync(Guid ambalazaId)

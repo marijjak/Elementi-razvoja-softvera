@@ -8,7 +8,7 @@ using System.Text;
 {
     public interface IBiljkeRepozitorijum
     {
-        Biljka Dodaj(Biljka biljka);
+        Biljka? Dodaj(Biljka biljka);
         Biljka? NadjiPoId(Guid id);
         IEnumerable<Biljka> Sve();
         bool ObrisiPrazne();

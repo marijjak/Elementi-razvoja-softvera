@@ -9,6 +9,6 @@ namespace Domain.Servisi
 {
     public interface IPreradaServis
     {
-        Parfem NapraviParfem(string nazivParfema, int brojBocica, int zapreminaBociceMl, string tipParfema);
+       bool NapraviParfem(string nazivParfema, int brojBocica, int zapreminaBociceMl, string tipParfema, out Parfem parfem);
     }
 }

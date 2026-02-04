@@ -10,7 +10,7 @@ namespace Domain.Repozitorijumi
 {
     public interface IAmbalazaRepozitorijum
     {
-        Ambalaza Dodaj(Ambalaza ambalaza);
+        Ambalaza? Dodaj(Ambalaza ambalaza);
         Ambalaza? NadjiPoId(Guid id);
         IEnumerable<Ambalaza> Sve();
         bool Azuriraj(Ambalaza ambalaza);

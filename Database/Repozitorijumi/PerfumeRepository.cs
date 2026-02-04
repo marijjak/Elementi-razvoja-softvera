@@ -1,5 +1,6 @@
 ﻿using Domain.BazaPodataka;
 using Domain.Modeli;
+using Domain.PomocneMetode;
 using Domain.Repozitorijumi;
 using System;
 using System.Collections.Generic;
@@ -18,34 +19,56 @@ namespace Database.Repozitorijumi
             _baza = baza;
         }
 
-        public Parfem Dodaj(Parfem parfem)
+        public Parfem? Dodaj(Parfem parfem)
         {
-            int redniBroj = _baza.Tabele.Parfemi.Count + 1;
+            try
+            {
+                if (!PomocneParfem.GenerisiSerijskiBroj(parfem))
+                {
+                    return null;
+                }
 
-            parfem.SerijskiBroj = $"PP-2025-{redniBroj:D4}";
+                _baza.Tabele.Parfemi.Add(parfem);
+                _baza.SacuvajPromene();
 
-            _baza.Tabele.Parfemi.Add(parfem);
-            _baza.SacuvajPromene();
-
-            return parfem;
+                return parfem;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public IEnumerable<Parfem> Svi()
         {
-            return _baza.Tabele.Parfemi;
+            try
+            {
+                return _baza.Tabele.Parfemi;
+            }
+            catch
+            {
+                return [];
+            }
         }
         public bool AzurirajKolicinu(Guid parfemId, int novaKolicina)
         {
-            var parfem = _baza.Tabele.Parfemi.FirstOrDefault(p => p.Id == parfemId);
+            try
+            {
+                var parfem = _baza.Tabele.Parfemi.FirstOrDefault(p => p.Id == parfemId);
 
-            if (parfem == null || novaKolicina < 0)
+                if (parfem == null || novaKolicina < 0)
+                {
+                    return false;
+                }
+
+                parfem.KolicinaNaStanju = novaKolicina;
+                _baza.SacuvajPromene();
+                return true;
+            }
+            catch
             {
                 return false;
             }
-
-            parfem.KolicinaNaStanju = novaKolicina;
-            _baza.SacuvajPromene();
-            return true;
         }
     }
 }

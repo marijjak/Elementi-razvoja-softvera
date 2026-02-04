@@ -13,21 +13,42 @@ namespace Database.Repozitorijumi
             _baza = baza;
         }
 
-        public Ambalaza Dodaj(Ambalaza ambalaza)
+        public Ambalaza? Dodaj(Ambalaza ambalaza)
         {
-            _baza.Tabele.Ambalaze.Add(ambalaza);
-            _baza.SacuvajPromene();
-            return ambalaza;
+            try
+            {
+                _baza.Tabele.Ambalaze.Add(ambalaza);
+                _baza.SacuvajPromene();
+                return ambalaza;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public Ambalaza? NadjiPoId(Guid id)
         {
-            return _baza.Tabele.Ambalaze.FirstOrDefault(a => a.Id == id);
+            try
+            {
+                return _baza.Tabele.Ambalaze.FirstOrDefault(a => a.Id == id);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public IEnumerable<Ambalaza> Sve()
         {
-            return _baza.Tabele.Ambalaze;
+            try
+            {
+                return _baza.Tabele.Ambalaze;
+            }
+            catch
+            {
+                return [];
+            }
         }
 
         public bool Azuriraj(Ambalaza ambalaza)

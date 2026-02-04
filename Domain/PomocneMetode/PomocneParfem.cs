@@ -17,8 +17,9 @@ namespace Domain.PomocneMetode
                     return false;
                 }
 
-                parfem.SerijskiBroj = $"PP-2025-{parfem.Id.ToString().Substring(0, 8).ToUpper()}";
-                return true;
+            parfem.SerijskiBroj = $"PP-2025-{parfem.Id.ToString().ToUpper()}";
+
+            return true;
             }
 
 

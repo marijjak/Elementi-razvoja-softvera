@@ -17,7 +17,6 @@ namespace Services
         private readonly IBiljkeRepozitorijum _biljkeRepo;
         private readonly IPerfumeRepository _parfemRepo;
         private readonly IBiljkeServis _biljkeServis;
-        private const int ML_PO_BILJCI = 50; // Specifikacija: 1 biljka = 50ml
 
         public PreradaServis(IBiljkeServis biljkeServis, IPerfumeRepository parfemRepo, IBiljkeRepozitorijum biljkeRepo)
         {
@@ -27,13 +26,14 @@ namespace Services
         }
 
 
-        public Parfem NapraviParfem(string nazivParfema, int brojBocica, int zapreminaBociceMl, string tipParfema)
+        public bool NapraviParfem(string nazivParfema, int brojBocica, int zapreminaBociceMl, string tipParfema, out Parfem parfem)
         {
+            parfem = null;
             try
             {
                 if (zapreminaBociceMl != 150 && zapreminaBociceMl != 250)
                 {
-                    return null;
+                    return false;
                 }
 
                 int ukupnoMl = brojBocica * zapreminaBociceMl;
@@ -50,12 +50,12 @@ namespace Services
 
                     if (!_biljkeServis.ZasadiNovuBiljku("Naknadno zasadjena", "L. Nova", "Srbija", nasumicnaJacina))
                     {
-                        return null;
+                        return false;
                     }
                     var novaBiljka = _biljkeServis.SveBiljke().Last();
                     if (!_biljkeServis.OznaciBiljkuKaoUbranu(novaBiljka.Id))
                     {
-                        return null;
+                        return false;
                     }
 
                     ubraneBiljke.Add(novaBiljka);
@@ -65,51 +65,58 @@ namespace Services
                 {
                     if (!BiljkaPomocne.PromeniStanje(biljka, StanjeBiljke.Preradjena))
                     {
-                        return null;
+                        return false;
                     }
-                    _biljkeServis.DodajBiljku(biljka);
+                    if (!_biljkeServis.DodajBiljku(biljka))
+                    {
+                        return false;
+                    }
                 }
 
                 double prosecnaJacina = ubraneBiljke.Average(b => b.JacinaArome);
 
                 if (prosecnaJacina > 4.0)
                 {
-                    double procenatOdstupanja = prosecnaJacina - 4.0;
-
-                    if (!_biljkeServis.ZasadiNovuBiljku("Balansna Biljka", "B. Arome", "Srbija", 3.0))
+                    if (!_biljkeServis.ZasadiNovuBiljku("Balansna Biljka", "B. Arome", "Srbija", 4.65))
                     {
-                        return null;
+                        return false;
                     }
 
                     var balansnaBiljka = _biljkeServis.SveBiljke().Last();
 
-                    if (!_biljkeServis.PromeniJacinuUljaProcentualno(balansnaBiljka.Id.ToString(), procenatOdstupanja))
+                    if (!_biljkeServis.PromeniJacinuUljaProcentualno(balansnaBiljka.Id.ToString(), -35))
                     {
-                        return null;
+                        return false;
                     }
                 }
 
-                Parfem noviParfem = new Parfem
+                var noviParfem = new Parfem
                 {
                     Naziv = nazivParfema,
                     TipParfema = tipParfema,
                     BrojBocica = brojBocica,
                     ZapreminaBociceMl = zapreminaBociceMl,
                     UkupnaKolicinaMl = ukupnoMl,
-                    KolicinaNaStanju = brojBocica
+                    KolicinaNaStanju = brojBocica,
+                    BiljkaIds = ubraneBiljke.Select(b => b.Id).ToList(),
+                    RokTrajanja = DateTime.Now.AddYears(2)
                 };
 
                 if (!PomocneParfem.GenerisiSerijskiBroj(noviParfem))
                 {
-                    return null;
+                    return false;
                 }
-                _parfemRepo.Dodaj(noviParfem);
+                if (_parfemRepo.Dodaj(noviParfem) == null)
+                {
+                    return false;
+                }
 
-                return noviParfem;
+                parfem = noviParfem;
+                return true;
             }
             catch
             {
-                return null;
+                return false;
             }
         }
 

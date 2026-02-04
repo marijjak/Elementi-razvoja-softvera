@@ -35,24 +35,32 @@ namespace Database.Repozitorijumi
 
         public IEnumerable<Dogadjaj> Sve()
         {
-            if (!File.Exists(_putanjaDoFajla))
+           try
             {
-                return new List<Dogadjaj>();
-            }
+                if (!File.Exists(_putanjaDoFajla))
+                {
+                    return new List<Dogadjaj>();
+                }
+            
 
             var sveLinije = File.ReadAllLines(_putanjaDoFajla);
             var listaDogadjaja = new List<Dogadjaj>();
 
-            foreach (var linija in sveLinije)
-            {
-                listaDogadjaja.Add(new Dogadjaj
-                { Opis = linija,
-                  Vreme = DateTime.Now
-
-                });
+                foreach (var linija in sveLinije)
+                {
+                    listaDogadjaja.Add(new Dogadjaj
+                    {
+                        Opis = linija,
+                        Vreme = DateTime.Now
+                    });
+                }
+                return listaDogadjaja;
             }
+            catch
+            {
+                return new List<Dogadjaj>();
 
-            return listaDogadjaja;
+            }
         }
     }
 }

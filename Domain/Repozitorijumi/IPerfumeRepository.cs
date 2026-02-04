@@ -9,7 +9,7 @@ namespace Domain.Repozitorijumi
 {
     public interface IPerfumeRepository
     {
-        Parfem Dodaj(Parfem parfem);
+        Parfem? Dodaj(Parfem parfem);
         IEnumerable<Parfem> Svi();
 
         bool AzurirajKolicinu(Guid parfemId, int novaKolicina);

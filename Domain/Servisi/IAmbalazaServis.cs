@@ -10,8 +10,7 @@ namespace Domain.Servisi
 {
     public interface IAmbalazaServis
     {
-        Ambalaza KreirajAmbalazu(string naziv, string adresaPosiljaoca, Guid skladisteId, IEnumerable<Guid> parfemIds);
-        IEnumerable<Ambalaza> SveAmbalaze();
-        Ambalaza DodajParfemeUAmbalazu(Guid ambalazaId, IEnumerable<Guid> parfemIds);
+        bool KreirajAmbalazu(string naziv, string adresaPosiljaoca, Guid skladisteId, IEnumerable<Guid> parfemIds, out Ambalaza ambalaza); IEnumerable<Ambalaza> SveAmbalaze();
+        bool DodajParfemeUAmbalazu(Guid ambalazaId, IEnumerable<Guid> parfemIds, out Ambalaza ambalaza);
     }
 }

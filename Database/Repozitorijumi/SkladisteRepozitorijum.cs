@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Database.Repozitorijumi
 {
-    public  class SkladisteRepozitorijum:ISkladisteRepozitorijum
+    public class SkladisteRepozitorijum : ISkladisteRepozitorijum
     {
         private readonly IBazaPodataka _baza;
 
@@ -20,24 +20,40 @@ namespace Database.Repozitorijumi
 
         public bool NadjiPoId(Guid id, out Skladiste skladiste)
         {
-            var pronadjeno = _baza.Tabele.Skladista
-                .FirstOrDefault(s => s.Id == id);
+            try
+            {
+                var pronadjeno = _baza.Tabele.Skladista
+                    .FirstOrDefault(s => s.Id == id);
 
-            if (pronadjeno == null)
+                if (pronadjeno == null)
+                {
+                    skladiste = null!;
+                    return false;
+                }
+
+                skladiste = pronadjeno;
+                return true;
+            }
+            catch
             {
                 skladiste = null!;
                 return false;
             }
-
-            skladiste = pronadjeno;
-            return true;
         }
 
 
 
-        public void Sacuvaj()
+        public bool Sacuvaj()
         {
-            _baza.SacuvajPromene();
+            try
+            {
+                _baza.SacuvajPromene();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
     }

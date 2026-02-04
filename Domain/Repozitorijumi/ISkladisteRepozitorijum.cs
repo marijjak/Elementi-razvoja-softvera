@@ -10,7 +10,7 @@ namespace Domain.Repozitorijumi
     public interface ISkladisteRepozitorijum
     {
         bool NadjiPoId(Guid id, out Skladiste skladiste);
-        void Sacuvaj();
+        bool Sacuvaj();
     }
 
 }

@@ -562,8 +562,14 @@ namespace Presentation.Meni
 
             try
             {
-                var parfem = _preradaServis.NapraviParfem(naziv, br, zap, tip);
-                Pauza($"Parfem uspešno napravljen! Serijski broj: {parfem.SerijskiBroj}");
+                if (_preradaServis.NapraviParfem(naziv, br, zap, tip, out var parfem))
+                {
+                    Pauza($"Parfem uspešno napravljen! Serijski broj: {parfem.SerijskiBroj}");
+                }
+                else
+                {
+                    Pauza("Greška prilikom pravljenja parfema.");
+                }
             }
             catch (Exception ex)
             {
@@ -681,13 +687,13 @@ namespace Presentation.Meni
 
             try
             {
-                var ambalaza = _ambalazaServis.KreirajAmbalazu(naziv, adresa, skladisteId, parfemIds);
-                Pauza($"Ambalaža kreirana! ID: {ambalaza.Id}");
-                if (ambalaza == null)
+                if (!_ambalazaServis.KreirajAmbalazu(naziv, adresa, skladisteId, parfemIds, out var ambalaza))
                 {
                     Pauza("Greška pri kreiranju ambalaže.");
                     return;
                 }
+
+                Pauza($"Ambalaža kreirana! ID: {ambalaza.Id}");
 
             }
             catch (Exception ex)
@@ -771,8 +777,7 @@ namespace Presentation.Meni
 
             try
             {
-                var ambalaza = _ambalazaServis.DodajParfemeUAmbalazu(ambalazaId, parfemIds);
-                if (ambalaza == null)
+                if (!_ambalazaServis.DodajParfemeUAmbalazu(ambalazaId, parfemIds, out var ambalaza))
                 {
                     Pauza("Greška pri dodavanju parfema u ambalažu.");
                     return;

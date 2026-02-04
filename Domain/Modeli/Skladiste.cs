@@ -11,16 +11,9 @@ namespace Domain.Modeli
         public Guid Id { get; set; } = Guid.NewGuid();
         public string Naziv { get; set; } = string.Empty;
 
+        public string Lokacija { get; set; } = string.Empty;
         public int MaxBrojAmbalaza { get; set; }
         public int TrenutniBrojAmbalaza { get; set; }
-        public bool ImaMesta(int kolicina)
-        {
-            return TrenutniBrojAmbalaza + kolicina <= MaxBrojAmbalaza;
-        }
-
-        public void DodajAmbalazu(int kolicina)
-        {
-            TrenutniBrojAmbalaza += kolicina;
-        }
+      
     }
 }

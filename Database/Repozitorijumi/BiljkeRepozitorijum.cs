@@ -18,33 +18,55 @@ namespace Database.Repozitorijumi
             _baza = baza;
         }
 
-        public Biljka Dodaj(Biljka biljka)
+        public Biljka? Dodaj(Biljka biljka)
         {
-            var postojeca = _baza.Tabele.Biljke.FirstOrDefault(b => b.Id == biljka.Id);
-
-            if (postojeca != null)
+          try
             {
-                postojeca.JacinaArome = biljka.JacinaArome;
-                postojeca.Stanje = biljka.Stanje;
+                var postojeca = _baza.Tabele.Biljke.FirstOrDefault(b => b.Id == biljka.Id);
+
+                if (postojeca != null)
+                {
+                    postojeca.JacinaArome = biljka.JacinaArome;
+                    postojeca.Stanje = biljka.Stanje;
+                }
+                else
+                {
+                    _baza.Tabele.Biljke.Add(biljka);
+                }
+
+                _baza.SacuvajPromene();
+                return biljka;
             }
-            else
+            catch
             {
-                _baza.Tabele.Biljke.Add(biljka);
+                return null;
             }
 
-            _baza.SacuvajPromene();
-            return biljka;
         }
 
         public Biljka? NadjiPoId(Guid id)
         {
-            return _baza.Tabele.Biljke
-                .FirstOrDefault(b => b.Id == id);
+            try
+            {
+                return _baza.Tabele.Biljke
+                    .FirstOrDefault(b => b.Id == id);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public IEnumerable<Biljka> Sve()
         {
-            return _baza.Tabele.Biljke;
+            try
+            {
+                return _baza.Tabele.Biljke;
+            }
+            catch
+            {
+                return [];
+            }
         }
         public bool ObrisiPrazne()
         {

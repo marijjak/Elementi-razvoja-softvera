@@ -25,7 +25,9 @@ namespace Domain.Modeli
         public int KolicinaNaStanju { get; set; }
 
         public DateTime DatumKreiranja { get; set; } = DateTime.Now;
+        public List<Guid> BiljkaIds { get; set; } = [];
 
-      
+        public DateTime RokTrajanja { get; set; } = DateTime.Now.AddYears(2);
+
     }
 }

@@ -10,5 +10,6 @@ namespace Domain.Konstante
     {
         public const string PutanjaBaze = "baza.json";
         public const int MlPoBiljci = 50;
+        public const string DefaultSkladisteId = "3f2504e0-4f89-11d3-9a0c-0305e82c3301";
     }
 }
