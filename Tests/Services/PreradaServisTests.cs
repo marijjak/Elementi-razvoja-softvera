@@ -17,7 +17,8 @@ namespace Tests.Services
         private Mock<IBiljkeServis> _biljkeServisMock = null;
         private Mock<IPerfumeRepository> _parfemRepoMock = null;
         private Mock<IBiljkeRepozitorijum> _biljkeRepoMock = null;
-        private PreradaServis _servis = null; 
+        private Mock<ILoggerServis> _loggerServisMock = null; 
+        private PreradaServis _servis = null;
 
         [SetUp]
         public void Setup()
@@ -25,11 +26,13 @@ namespace Tests.Services
             _biljkeServisMock = new Mock<IBiljkeServis>();
             _parfemRepoMock = new Mock<IPerfumeRepository>();
             _biljkeRepoMock = new Mock<IBiljkeRepozitorijum>();
+            _loggerServisMock = new Mock<ILoggerServis>(); 
 
             _servis = new PreradaServis(
                 _biljkeServisMock.Object,
                 _parfemRepoMock.Object,
-                _biljkeRepoMock.Object
+                _biljkeRepoMock.Object,
+                _loggerServisMock.Object 
             );
         }
 
