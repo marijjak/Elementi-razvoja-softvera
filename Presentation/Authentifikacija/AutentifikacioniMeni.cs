@@ -57,7 +57,7 @@ namespace Presentation.Authentifikacija
                 ? TipKorisnika.MenadzerProdaje
                 : TipKorisnika.Prodavac;
 
-            // Kreiranje novog korisnika
+           
             Korisnik noviKorisnik = new Korisnik(
                 korisnickoIme.Trim(),
                 lozinka.Trim(),
@@ -65,7 +65,7 @@ namespace Presentation.Authentifikacija
                 uloga
             );
 
-            // Pokušaj registracije
+           
             (uspesnaRegistracija, korisnik) = autentifikacijaServis.Registracija(noviKorisnik);
 
             return uspesnaRegistracija;

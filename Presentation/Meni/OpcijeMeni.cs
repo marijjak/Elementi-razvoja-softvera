@@ -85,7 +85,7 @@ namespace Presentation.Meni
             Pauza("");
         }
 
-        // ==================== GLAVNI MENI  ====================
+       
         public void PrikaziGlavniMeni()
         {
             bool kraj = false;
@@ -157,7 +157,7 @@ namespace Presentation.Meni
             }
         }
 
-        // ==================== PROFIL ====================
+   
         private void PrikaziProfil()
         {
             Console.Clear();
@@ -168,7 +168,7 @@ namespace Presentation.Meni
             Pauza("Pritisnite bilo koji taster za nastavak...");
         }
 
-        // ==================== MENADŽERSKE OPCIJE ====================
+        
         private void PrikaziMenadzerMeni()
         {
             bool nazad = false;
@@ -238,7 +238,7 @@ namespace Presentation.Meni
             }
         }
 
-        // ==================== PREGLED BILJAKA ====================
+      
         private void PregledBiljaka()
         {
             Console.Clear();
@@ -267,14 +267,14 @@ namespace Presentation.Meni
             Pauza("Pritisnite bilo koji taster...");
         }
 
-        // ==================== HELPER METODA ====================
+       
         private void Pauza(string poruka)
         {
             Console.WriteLine(poruka);
             Console.WriteLine("\nPritisnite bilo koji taster...");
             Console.ReadKey();
         }
-        // ==================== DODAJ BILJKU ====================
+    
         private void DodajNovuBiljku()
         {
             Console.Clear();
@@ -347,7 +347,7 @@ namespace Presentation.Meni
             Pauza("");
         }
 
-        // ==================== OZNAČI BILJKU KAO UBRANU ====================
+ 
         private void OznaciBiljkuKaoUbranu()
         {
             Console.Clear();
@@ -391,7 +391,7 @@ namespace Presentation.Meni
             }
         }
 
-        // ==================== PREGLED DOGAĐAJA ====================
+       
         private void PregledDogadjaja()
         {
             Console.Clear();
