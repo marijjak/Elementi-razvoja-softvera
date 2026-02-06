@@ -22,7 +22,8 @@ namespace Loger_Bloger
             IBazaPodataka bazaPodataka = new JsonBazaPodataka();
             ILoggerServis loggerServis = new LoggerServis();
 
-           
+            loggerServis.InicijalizujLogFajl();
+
             IKorisniciRepozitorijum korisniciRepozitorijum = new KorisniciRepozitorijum(bazaPodataka);
             IBiljkeRepozitorijum biljkeRepozitorijum = new BiljkeRepozitorijum(bazaPodataka);
             IDogadjajiRepozitorijum dogadjajiRepozitorijum = new DogadjajiRepozitorijum(bazaPodataka);

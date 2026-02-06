@@ -9,6 +9,23 @@ namespace Services
     {
         private readonly string _putanja = "log.txt";
 
+        public bool InicijalizujLogFajl()
+        {
+            try
+            {
+                if (!File.Exists(_putanja))
+                {
+                    using (FileStream fs = File.Create(_putanja))
+                    {
+                    }
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
         public bool EvidentirajDogadjaj(TipEvidencije tip, string poruka)
         {
             try
