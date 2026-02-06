@@ -13,11 +13,11 @@ namespace Domain.Modeli
         public DateTime Vreme { get; set; }
         public string Opis { get; set; } = string.Empty;
         public TipEvidencije Tip { get; set; }
-        public Guid? EntitetId { get; set; } // npr. ID biljke, parfema
+        public Guid? EntitetId { get; set; } 
 
         public Dogadjaj()
         {
-            // za JSON
+            
         }
 
         public Dogadjaj(string opis, TipEvidencije tip, Guid? entitetId = null)

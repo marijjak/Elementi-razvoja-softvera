@@ -18,7 +18,7 @@ namespace Domain.Modeli
 
         public int BrojBocica { get; set; }
 
-        public int ZapreminaBociceMl { get; set; }   // 150 ili 250
+        public int ZapreminaBociceMl { get; set; }   
 
         public int UkupnaKolicinaMl { get; set; }
 
