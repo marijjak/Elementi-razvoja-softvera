@@ -17,7 +17,7 @@ namespace Domain.Modeli
         public double JacinaArome { get; set; }   // 1–5 
         public string ZemljaPorekla { get;  set; } = string.Empty;
         public StanjeBiljke Stanje { get;  set; } = StanjeBiljke.Posadjena;
-        public Biljka() { }  //za json
+        public Biljka() { }  
         public Biljka(
             string opstiNaziv,
             string latinskiNaziv,

@@ -18,11 +18,11 @@ namespace Loger_Bloger
 
         public static void Main()
         {
-            // Baza podataka - JSON implementacija
+          
             IBazaPodataka bazaPodataka = new JsonBazaPodataka();
             ILoggerServis loggerServis = new LoggerServis();
 
-            // Repozitorijumi
+           
             IKorisniciRepozitorijum korisniciRepozitorijum = new KorisniciRepozitorijum(bazaPodataka);
             IBiljkeRepozitorijum biljkeRepozitorijum = new BiljkeRepozitorijum(bazaPodataka);
             IDogadjajiRepozitorijum dogadjajiRepozitorijum = new DogadjajiRepozitorijum(bazaPodataka);
@@ -45,34 +45,30 @@ namespace Loger_Bloger
                 Console.WriteLine($"Kreirano početno skladište: {pocetnoSkladiste.Naziv} (ID: {pocetnoSkladiste.Id}).");
             }
 
-            // TODO: Dodati ostale repozitorijume 
             if (!biljkeRepozitorijum.ObrisiPrazne())
             {
                 Console.WriteLine("Upozorenje: Čišćenje praznih biljaka nije uspelo.");
             }
            
 
-            // Servisi
             IAutentifikacijaServis autentifikacijaServis = new AutentifikacioniServis(korisniciRepozitorijum);
             IDogadjajiServis dogadjajiServis = new DogadjajiServis(dogadjajiRepozitorijum);
             IBiljkeServis biljkeServis = new BiljkeServis(biljkeRepozitorijum, dogadjajiServis);
             IPreradaServis preradaServis = new PreradaServis(biljkeServis, perfumeRepo, biljkeRepozitorijum);
             ISkladisteServis skladisteServis = new SkladisteServis(skladisteRepozitorijum);
             IAmbalazaServis ambalazaServis = new AmbalazaServis(ambalazaRepozitorijum, dogadjajiServis, perfumeRepo, skladisteServis);
-            // Umesto direktnog kreiranja, koristi interfejs ako je moguće
-            // Dodaj slovo 's' (ISkladisniLogistickiServis)
             ISkladisniLogistickiServis magacinServis = new MagacinskiCentarServis(ambalazaRepozitorijum, dogadjajiServis);
             ISkladisniLogistickiServis distributivniCentarServis = new DistributivniCentarServis(ambalazaRepozitorijum, dogadjajiServis);
 
 
-            // Izmeni liniju 58 u Program.cs:
+         
             IProdajaServis prodajaServis = new ProdajaServis(
                 prodajaRepo,
                 loggerServis,
                 dogadjajiServis,
-                (ISkladisteServis)distributivniCentarServis, // Kastujemo jer ProdajaServis traži ISkladisteServis
+                (ISkladisteServis)distributivniCentarServis, 
                 (ISkladisteServis)magacinServis,
-                ambalazaRepozitorijum // Ovo je onaj parametar koji ti je falio i zbog kog se crvenelo
+                ambalazaRepozitorijum 
             );
             ISkladisteProvider skladisteProvider = new SkladisteProvider(magacinServis, distributivniCentarServis);
             if (korisniciRepozitorijum.SviKorisnici().Count() == 0)
