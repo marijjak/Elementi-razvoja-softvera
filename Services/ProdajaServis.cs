@@ -61,16 +61,15 @@ namespace Services
 
         public bool PokusajDobaviRacuneZaDan(Korisnik korisnik, DateTime datum, out List<FiskalniRacun> racuniZaDan)
         {
-            racuniZaDan = new List<FiskalniRacun>();
 
-            if (!RacunPomocneMetode.DaLiJeMenadzer(korisnik))
+            var sviRacuni = _racunRepo.GetSviRacuni();
+            var uspeh = RacunPomocneMetode.PokusajDobaviRacuneZaDan(korisnik, sviRacuni, datum, out racuniZaDan);
+
+            if (!uspeh)
             {
                 _logger.EvidentirajDogadjaj(TipEvidencije.WARNING, "Neovlascen pokusaj pristupa fiskalnim racunima.");
                 return false;
             }
-
-            var sviRacuni = _racunRepo.GetSviRacuni().ToList();
-            racuniZaDan = RacunPomocneMetode.FiltrirajPoDatumu(sviRacuni, datum);
 
             _logger.EvidentirajDogadjaj(TipEvidencije.INFO, $"Menadzer je dobavio racune za datum {datum.ToShortDateString()}.");
 

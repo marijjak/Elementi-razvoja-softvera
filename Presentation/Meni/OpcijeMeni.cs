@@ -1,5 +1,7 @@
-﻿using Domain.Enumeracije;
+﻿using System;
+using Domain.Enumeracije;
 using Domain.Modeli;
+using Domain.PomocneMetode;
 using Domain.Repozitorijumi;
 using Domain.Servisi;
 using Services;
@@ -505,6 +507,8 @@ namespace Presentation.Meni
         {
             decimal cenaPoBocici = IzracunajCenuPoBocici(parfem);
             decimal ukupno = cenaPoBocici * kolicina;
+            var tipProdaje = OdaberiTipProdaje();
+            var nacinPlacanja = OdaberiNacinPlacanja();
 
             var noviRacun = new FiskalniRacun
             {
@@ -512,8 +516,8 @@ namespace Presentation.Meni
                 DatumIzdavanja = DateTime.Now,
                 ImeProdavca = _ulogovan.ImePrezime,
                 UkupanIznos = ukupno,
-                TipProdaje = TipProdaje.Maloprodaja,
-                NacinPlacanja = NacinPlacanja.Gotovina,
+                TipProdaje = tipProdaje,
+                NacinPlacanja = nacinPlacanja,
                 Stavke = new Dictionary<Guid, int>()
             };
             noviRacun.Stavke.Add(parfem.Id, kolicina);
@@ -535,7 +539,63 @@ namespace Presentation.Meni
             Console.WriteLine($"Količina: {kolicina}");
             Console.WriteLine($"Jedinična cena: {cenaPoBocici:N2} RSD");
             Console.WriteLine($"Ukupan iznos: {ukupno:N2} RSD");
+            Console.WriteLine($"Tip prodaje: {tipProdaje}");
+            Console.WriteLine($"Način plaćanja: {nacinPlacanja}");
             Pauza("Pritisnite bilo koji taster za nastavak...");
+        }
+
+        private static TipProdaje OdaberiTipProdaje()
+        {
+            while (true)
+            {
+                Console.WriteLine("\nOdaberite tip prodaje:");
+                Console.WriteLine("1. Maloprodaja");
+                Console.WriteLine("2. Veleprodaja");
+                Console.Write("Izbor: ");
+
+                var izbor = Console.ReadLine();
+                if (izbor == "1")
+                {
+                    return TipProdaje.Maloprodaja;
+                }
+
+                if (izbor == "2")
+                {
+                    return TipProdaje.Veleprodaja;
+                }
+
+                Console.WriteLine("Nevalidan izbor. Pokušajte ponovo.");
+            }
+        }
+
+        private static NacinPlacanja OdaberiNacinPlacanja()
+        {
+            while (true)
+            {
+                Console.WriteLine("\nOdaberite način plaćanja:");
+                Console.WriteLine("1. Gotovina");
+                Console.WriteLine("2. Uplata na račun");
+                Console.WriteLine("3. Kartično plaćanje");
+                Console.Write("Izbor: ");
+
+                var izbor = Console.ReadLine();
+                if (izbor == "1")
+                {
+                    return NacinPlacanja.Gotovina;
+                }
+
+                if (izbor == "2")
+                {
+                    return NacinPlacanja.UplataNaRacun;
+                }
+
+                if (izbor == "3")
+                {
+                    return NacinPlacanja.KarticnoPlacanje;
+                }
+
+                Console.WriteLine("Nevalidan izbor. Pokušajte ponovo.");
+            }
         }
 
         private static decimal IzracunajCenuPoBocici(Parfem parfem)
@@ -796,23 +856,23 @@ namespace Presentation.Meni
             Console.Clear();
             Console.WriteLine("\n===== PREGLED FISKALNIH RAČUNA (Dnevni promet) =====");
 
-        
+
 
             bool uspeh = _prodajaServis.PokusajDobaviRacuneZaDan(_ulogovan, DateTime.Now, out List<FiskalniRacun> racuni);
 
-           
+
 
             if (uspeh && racuni != null && racuni.Count > 0)
             {
-                Console.WriteLine($"{"ID Računa",-38} | {"Iznos",-12} | {"Datum i vreme"}");
-                Console.WriteLine(new string('-', 75));
-
+                Console.WriteLine($"{"ID Računa",-38} | {"Iznos",-12} | {"Tip prodaje",-12} | {"Način plaćanja",-16} | {"Datum i vreme"}");
+                Console.WriteLine(new string('-', 115));
+              
                 foreach (var r in racuni)
                 {
-                    Console.WriteLine($"{r.Id,-38} | {r.UkupanIznos,8:N2} RSD | {r.DatumIzdavanja:dd.MM.yyyy HH:mm}");
+                    Console.WriteLine($"{r.Id,-38} | {r.UkupanIznos,8:N2} RSD | {r.TipProdaje,-12} | {r.NacinPlacanja,-16} | {r.DatumIzdavanja:dd.MM.yyyy HH:mm}");
                 }
 
-                Console.WriteLine(new string('-', 75));
+                Console.WriteLine(new string('-', 115));
                 Console.WriteLine($"UKUPAN PROMET: {racuni.Sum(r => r.UkupanIznos):N2} RSD");
             }
             else
