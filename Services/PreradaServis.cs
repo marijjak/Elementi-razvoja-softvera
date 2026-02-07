@@ -17,12 +17,14 @@ namespace Services
         private readonly IBiljkeRepozitorijum _biljkeRepo;
         private readonly IPerfumeRepository _parfemRepo;
         private readonly IBiljkeServis _biljkeServis;
+        private readonly ILoggerServis _loggerServis; 
 
-        public PreradaServis(IBiljkeServis biljkeServis, IPerfumeRepository parfemRepo, IBiljkeRepozitorijum biljkeRepo)
+        public PreradaServis(IBiljkeServis biljkeServis, IPerfumeRepository parfemRepo, IBiljkeRepozitorijum biljkeRepo, ILoggerServis loggerServis)
         {
             _biljkeServis = biljkeServis;
             _parfemRepo = parfemRepo;
             _biljkeRepo = biljkeRepo;
+            _loggerServis = loggerServis;
         }
 
 
@@ -33,6 +35,7 @@ namespace Services
             {
                 if (zapreminaBociceMl != 150 && zapreminaBociceMl != 250)
                 {
+                    _loggerServis.EvidentirajDogadjaj(TipEvidencije.ERROR, $"Neuspešna prerada: Nedozvoljena zapremina bočice ({zapreminaBociceMl}ml).");
                     return false;
                 }
 
@@ -43,6 +46,11 @@ namespace Services
                     .Where(b => b.Stanje == StanjeBiljke.Ubrana)
                     .Take(potrebneBiljke)
                     .ToList();
+
+                if (ubraneBiljke.Count < potrebneBiljke)
+                {
+                    _loggerServis.EvidentirajDogadjaj(TipEvidencije.WARNING, $"Nedovoljno ubranih biljaka. Sistem automatski sadi i bere {potrebneBiljke - ubraneBiljke.Count} biljaka.");
+                }
 
                 while (ubraneBiljke.Count < potrebneBiljke)
                 {
@@ -77,6 +85,8 @@ namespace Services
 
                 if (prosecnaJacina > 4.0)
                 {
+                    _loggerServis.EvidentirajDogadjaj(TipEvidencije.WARNING, $"Parfem '{nazivParfema}' ima visoku prosečnu jačinu arome: {prosecnaJacina:F2}. Aktivira se balansiranje.");
+
                     if (!_biljkeServis.ZasadiNovuBiljku("Balansna Biljka", "B. Arome", "Srbija", 4.65))
                     {
                         return false;
@@ -108,14 +118,17 @@ namespace Services
                 }
                 if (_parfemRepo.Dodaj(noviParfem) == null)
                 {
+                    _loggerServis.EvidentirajDogadjaj(TipEvidencije.ERROR, $"Greška pri čuvanju parfema '{nazivParfema}' u bazu.");
                     return false;
                 }
 
                 parfem = noviParfem;
+                _loggerServis.EvidentirajDogadjaj(TipEvidencije.INFO, $"Uspešno proizveden parfem: {nazivParfema} ({brojBocica} komada).");
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                _loggerServis.EvidentirajDogadjaj(TipEvidencije.ERROR, $"Kritična greška u PreradaServis: {ex.Message}");
                 return false;
             }
         }
@@ -127,9 +140,14 @@ namespace Services
             int dostupno = _biljkeRepo.Sve()
                 .Count(b => b.Stanje == StanjeBiljke.Ubrana);
 
-            return dostupno >= potrebneBiljke;
+            bool imaDovoljno = dostupno >= potrebneBiljke;
+
+            if (!imaDovoljno)
+            {
+                _loggerServis.EvidentirajDogadjaj(TipEvidencije.WARNING, $"Provera resursa: Nedostaje biljaka za količinu od {ukupnoMl}ml.");
+            }
+
+            return imaDovoljno;
         }
-
-
     }
 }

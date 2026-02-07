@@ -52,7 +52,7 @@ namespace Presentation.Meni
             Console.Clear();
             Console.WriteLine($"=== PROCESUIRANJE ISPORUKE ({_ulogovan.Uloga}) ===");
 
-            var ambalaze = _ambalazaServis.SveAmbalaze()
+            var ambalaze = _ambalazaServis.Sve()
                 .Where(a => a.Status == StatusAmbalaze.Spakovana)
                 .ToList();
 
@@ -767,7 +767,7 @@ namespace Presentation.Meni
             Console.Clear();
             Console.WriteLine("\n===== PREGLED AMBALAŽA =====");
 
-            var ambalaze = _ambalazaServis.SveAmbalaze().ToList();
+            var ambalaze = _ambalazaServis.Sve().ToList();
 
             if (!ambalaze.Any())
             {
@@ -789,7 +789,7 @@ namespace Presentation.Meni
             Console.Clear();
             Console.WriteLine("\n===== DODAVANJE PARFEMA U AMBALAŽU =====");
 
-            var ambalaze = _ambalazaServis.SveAmbalaze().ToList();
+            var ambalaze = _ambalazaServis.Sve().ToList();
             if (!ambalaze.Any())
             {
                 Pauza("Nema dostupnih ambalaža.");
@@ -839,14 +839,17 @@ namespace Presentation.Meni
             {
                 if (!_ambalazaServis.DodajParfemeUAmbalazu(ambalazaId, parfemIds, out var ambalaza))
                 {
-                    Pauza("Greška pri dodavanju parfema u ambalažu.");
-                    return;
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Pauza("PAŽNJA: Operacija nije uspela. Proverite da li su ID-evi ispravni (pogledajte Pregled događaja).");
+                    Console.ResetColor(); return;
                 }
                 Pauza($"Uspešno dodati parfemi u ambalažu '{ambalaza.Naziv}'.");
             }
             catch (Exception ex)
             {
-                Pauza($"Greška: {ex.Message}");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Pauza($"KRITIČNA GREŠKA: {ex.Message}");
+                Console.ResetColor();
             }
         }
 

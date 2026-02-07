@@ -7,7 +7,6 @@ using Domain.Servisi;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Services
@@ -15,13 +14,11 @@ namespace Services
     public class ProdajaServis : IProdajaServis
     {
         private readonly IFiskalniRacunRepozitorijum _racunRepo;
-
         private readonly ILoggerServis _logger;
         private readonly IDogadjajiServis _dogadjaji;
         private readonly ISkladisteServis _distributivniCentar;
         private readonly ISkladisteServis _magacinskiCentar;
         private readonly IAmbalazaRepozitorijum _ambalazaRepo;
-
 
         public ProdajaServis(
             IFiskalniRacunRepozitorijum racunRepo,
@@ -46,15 +43,19 @@ namespace Services
                 if (korisnik.Uloga != TipKorisnika.MenadzerProdaje)
                 {
                     _dogadjaji.Zabelezi($"Neovlašćen pokušaj pristupa računima: {korisnik.KorisnickoIme}", TipEvidencije.WARNING);
+                    _logger.EvidentirajDogadjaj(TipEvidencije.WARNING, $"Korisnik {korisnik.KorisnickoIme} je pokušao neovlašćen pristup računima.");
                     return Enumerable.Empty<FiskalniRacun>();
                 }
 
                 _dogadjaji.Zabelezi($"Menadžer {korisnik.ImePrezime} je pregledao dnevni promet.", TipEvidencije.INFO);
+                _logger.EvidentirajDogadjaj(TipEvidencije.INFO, $"Menadžer {korisnik.KorisnickoIme} je pregledao listu računa.");
+
                 return _racunRepo.GetSviRacuni();
             }
-            catch (Exception ex)
+            catch
             {
-                _dogadjaji.Zabelezi($"Greška pri pregledu računa: {ex.Message}", TipEvidencije.ERROR);
+                
+                _logger.EvidentirajDogadjaj(TipEvidencije.ERROR, "Došlo je do greške u bazi prilikom dobavljanja računa.");
                 return Enumerable.Empty<FiskalniRacun>();
             }
         }
@@ -67,7 +68,7 @@ namespace Services
 
             if (!uspeh)
             {
-                _logger.EvidentirajDogadjaj(TipEvidencije.WARNING, "Neovlascen pokusaj pristupa fiskalnim racunima.");
+                _logger.EvidentirajDogadjaj(TipEvidencije.WARNING, $"Neovlašćen pokušaj dobavljanja izveštaja za dan: {datum.ToShortDateString()}.");
                 return false;
             }
 
@@ -81,7 +82,6 @@ namespace Services
             try
             {
                 ISkladisteServis trenutnoSkladiste = _magacinskiCentar;
-
                 var dostupnaAmbalaza = _ambalazaRepo.Sve().FirstOrDefault(a => a.Status == StatusAmbalaze.Spakovana);
 
                 if (dostupnaAmbalaza == null)
@@ -97,6 +97,7 @@ namespace Services
                     if (parfemIds.Any(id => zauzetiParfemi.Contains(id)))
                     {
                         _dogadjaji.Zabelezi("Parfem već postoji u drugoj ambalaži.", TipEvidencije.ERROR);
+                        _logger.EvidentirajDogadjaj(TipEvidencije.ERROR, "Neuspela prodaja: Parfemi su već rezervisani u drugoj ambalaži.");
                         return false;
                     }
 
@@ -112,20 +113,39 @@ namespace Services
                     if (_ambalazaRepo.Dodaj(dostupnaAmbalaza) == null)
                     {
                         _dogadjaji.Zabelezi("Nije moguće kreirati novu ambalažu.", TipEvidencije.ERROR);
+                        _logger.EvidentirajDogadjaj(TipEvidencije.ERROR, "Greška: Sistem nije mogao da generiše automatsku ambalažu.");
                         return false;
                     }
+
                     _dogadjaji.Zabelezi("Kreirana je nova ambalaža za prodaju.", TipEvidencije.INFO, dostupnaAmbalaza.Id);
+                    _logger.EvidentirajDogadjaj(TipEvidencije.INFO, "Automatski generisana ambalaža za potrebe nove prodaje.");
                 }
 
                 bool uspehSkladiste = await trenutnoSkladiste.PosaljiPaketAsync(dostupnaAmbalaza.Id);
 
-                if (!uspehSkladiste) return false;
+                if (!uspehSkladiste)
+                {
+                    _logger.EvidentirajDogadjaj(TipEvidencije.ERROR, $"Skladište je odbilo slanje paketa za ambalažu: {dostupnaAmbalaza.Id}");
+                    return false;
+                }
 
-                return _racunRepo.Dodaj(racun);
+                bool uspehRacun = _racunRepo.Dodaj(racun);
+
+                if (uspehRacun)
+                {
+                    _logger.EvidentirajDogadjaj(TipEvidencije.INFO, $"Prodaja uspešna. Izdat fiskalni račun ID: {racun.Id}");
+                }
+                else
+                {
+                    _logger.EvidentirajDogadjaj(TipEvidencije.ERROR, "Fiskalni račun nije mogao biti sačuvan u bazi.");
+                }
+
+                return uspehRacun;
             }
-            catch (Exception ex)
+            catch
             {
-                _dogadjaji.Zabelezi($"Greška pri dodavanju fiskalnog računa: {ex.Message}", TipEvidencije.ERROR);
+               
+                _logger.EvidentirajDogadjaj(TipEvidencije.ERROR, "Kritična greška u procesu prodaje. Operacija je prekinuta.");
                 return false;
             }
         }

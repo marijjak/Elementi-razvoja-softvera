@@ -10,20 +10,21 @@ using Presentation.Authentifikacija;
 using Presentation.Meni;
 using Services;
 using Services.AutenftikacioniServisi;
+using System;
+using System.Linq;
 
 namespace Loger_Bloger
 {
     public class Program
     {
-
         public static void Main()
         {
-          
+            
             IBazaPodataka bazaPodataka = new JsonBazaPodataka();
             ILoggerServis loggerServis = new LoggerServis();
-
             loggerServis.InicijalizujLogFajl();
 
+           
             IKorisniciRepozitorijum korisniciRepozitorijum = new KorisniciRepozitorijum(bazaPodataka);
             IBiljkeRepozitorijum biljkeRepozitorijum = new BiljkeRepozitorijum(bazaPodataka);
             IDogadjajiRepozitorijum dogadjajiRepozitorijum = new DogadjajiRepozitorijum(bazaPodataka);
@@ -31,9 +32,12 @@ namespace Loger_Bloger
             IAmbalazaRepozitorijum ambalazaRepozitorijum = new AmbalazaRepozitorijum(bazaPodataka);
             ISkladisteRepozitorijum skladisteRepozitorijum = new SkladisteRepozitorijum(bazaPodataka);
             IFiskalniRacunRepozitorijum prodajaRepo = new FiskalniRacunRepozitorijum(bazaPodataka);
+
+            
             if (!bazaPodataka.Tabele.Skladista.Any())
             {
-                Guid pocetnoSkladisteId = Guid.Parse(KONSTANTE.DefaultSkladisteId); var pocetnoSkladiste = new Skladiste
+                Guid pocetnoSkladisteId = Guid.Parse(KONSTANTE.DefaultSkladisteId);
+                var pocetnoSkladiste = new Skladiste
                 {
                     Id = pocetnoSkladisteId,
                     Naziv = "Glavno skladište",
@@ -50,62 +54,56 @@ namespace Loger_Bloger
             {
                 Console.WriteLine("Upozorenje: Čišćenje praznih biljaka nije uspelo.");
             }
-           
 
+           
             IAutentifikacijaServis autentifikacijaServis = new AutentifikacioniServis(korisniciRepozitorijum);
             IDogadjajiServis dogadjajiServis = new DogadjajiServis(dogadjajiRepozitorijum);
-            IBiljkeServis biljkeServis = new BiljkeServis(biljkeRepozitorijum, dogadjajiServis);
-            IPreradaServis preradaServis = new PreradaServis(biljkeServis, perfumeRepo, biljkeRepozitorijum);
+
+            
+            IBiljkeServis biljkeServis = new BiljkeServis(biljkeRepozitorijum, dogadjajiServis, loggerServis);
+            IPreradaServis preradaServis = new PreradaServis(biljkeServis, perfumeRepo, biljkeRepozitorijum, loggerServis);
+
             ISkladisteServis skladisteServis = new SkladisteServis(skladisteRepozitorijum);
-            IAmbalazaServis ambalazaServis = new AmbalazaServis(ambalazaRepozitorijum, dogadjajiServis, perfumeRepo, skladisteServis);
+
+            IAmbalazaServis ambalazaServis = new AmbalazaServis(
+                ambalazaRepozitorijum,
+                dogadjajiServis,
+                perfumeRepo,
+                skladisteServis,
+                loggerServis,
+                bazaPodataka
+            );
             ISkladisniLogistickiServis magacinServis = new MagacinskiCentarServis(ambalazaRepozitorijum, dogadjajiServis);
             ISkladisniLogistickiServis distributivniCentarServis = new DistributivniCentarServis(ambalazaRepozitorijum, dogadjajiServis);
 
-
-         
             IProdajaServis prodajaServis = new ProdajaServis(
                 prodajaRepo,
                 loggerServis,
                 dogadjajiServis,
-                (ISkladisteServis)distributivniCentarServis, 
+                (ISkladisteServis)distributivniCentarServis,
                 (ISkladisteServis)magacinServis,
-                ambalazaRepozitorijum 
+                ambalazaRepozitorijum
             );
-            ISkladisteProvider skladisteProvider = new SkladisteProvider(magacinServis, distributivniCentarServis);
-            if (korisniciRepozitorijum.SviKorisnici().Count() == 0)
-            {
-              
-                Korisnik menadzer = new Korisnik(
-                    "menadzer",
-                    "menadzer123",
-                    "Petar Petrović",
-                    TipKorisnika.MenadzerProdaje
-                );
 
-                Korisnik prodavac = new Korisnik(
-                    "prodavac",
-                    "prodavac123",
-                    "Marko Marković",
-                    TipKorisnika.Prodavac
-                );
+            ISkladisteProvider skladisteProvider = new SkladisteProvider(magacinServis, distributivniCentarServis);
+
+            
+            if (!korisniciRepozitorijum.SviKorisnici().Any())
+            {
+                Korisnik menadzer = new Korisnik("menadzer", "menadzer123", "Petar Petrović", TipKorisnika.MenadzerProdaje);
+                Korisnik prodavac = new Korisnik("prodavac", "prodavac123", "Marko Marković", TipKorisnika.Prodavac);
 
                 korisniciRepozitorijum.DodajKorisnika(menadzer);
                 korisniciRepozitorijum.DodajKorisnika(prodavac);
 
-                Console.WriteLine("Kreirani početni korisnici:");
-                Console.WriteLine("1. Menadžer prodaje - korisničko ime: 'menadzer', lozinka: 'menadzer123'");
-                Console.WriteLine("2. Prodavac - korisničko ime: 'prodavac', lozinka: 'prodavac123'");
-                Console.WriteLine();
+                Console.WriteLine("Kreirani početni korisnici (menadzer/menadzer123, prodavac/prodavac123).");
             }
 
-
-           
-
+            
             AutentifikacioniMeni am = new AutentifikacioniMeni(autentifikacijaServis);
             Korisnik prijavljen = new Korisnik();
-
-        
             bool uspesnoPrijavljen = false;
+
             while (!uspesnoPrijavljen)
             {
                 Console.Clear();
@@ -120,52 +118,23 @@ namespace Loger_Bloger
                 switch (opcija.Trim())
                 {
                     case "1":
-                      
-                        if (am.TryLogin(out prijavljen))
-                        {
-                            uspesnoPrijavljen = true;
-                        }
-                        else
-                        {
-                            Console.WriteLine("\nPogrešno korisničko ime ili lozinka. Pokušajte ponovo.");
-                            Console.WriteLine("Pritisnite bilo koji taster...");
-                            Console.ReadKey();
-                        }
+                        if (am.TryLogin(out prijavljen)) uspesnoPrijavljen = true;
+                        else { Console.WriteLine("\nPogrešna prijava."); Console.ReadKey(); }
                         break;
-
                     case "2":
-                       
-                        if (am.TryRegister(out prijavljen))
-                        {
-                            Console.WriteLine($"\nUspešno ste se registrovali kao: {prijavljen.ImePrezime}");
-                            uspesnoPrijavljen = true;
-                        }
-                        else
-                        {
-                            Console.WriteLine("\nRegistracija nije uspela. Korisničko ime možda već postoji ili su podaci nevalidni.");
-                            Console.WriteLine("Pritisnite bilo koji taster...");
-                            Console.ReadKey();
-                        }
+                        if (am.TryRegister(out prijavljen)) uspesnoPrijavljen = true;
+                        else { Console.WriteLine("\nRegistracija nije uspela."); Console.ReadKey(); }
                         break;
-
                     case "0":
-                        Console.WriteLine("Izlaz iz sistema...");
                         return;
-
                     default:
-                        Console.WriteLine("\nNevalidna opcija. Pokušajte ponovo.");
-                        Console.WriteLine("Pritisnite bilo koji taster...");
+                        Console.WriteLine("\nNevalidna opcija.");
                         Console.ReadKey();
                         break;
                 }
             }
 
-            Console.Clear();
-            Console.WriteLine($"\nUspešno ste prijavljeni kao: {prijavljen.ImePrezime} ({prijavljen.Uloga})");
-            Console.WriteLine("Pritisnite bilo koji taster za nastavak...");
-            Console.ReadKey();
-
-
+           
             OpcijeMeni meni = new OpcijeMeni(
                 autentifikacijaServis,
                 biljkeServis,
@@ -175,10 +144,11 @@ namespace Loger_Bloger
                 ambalazaServis,
                 (MagacinskiCentarServis)magacinServis,
                 (DistributivniCentarServis)distributivniCentarServis,
-                prijavljen,
+                prijavljen!,
                 skladisteProvider,
                 prodajaServis
             );
+
             meni.PrikaziGlavniMeni();
         }
     }
