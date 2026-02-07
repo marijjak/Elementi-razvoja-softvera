@@ -540,7 +540,7 @@ namespace Presentation.Meni
             Console.WriteLine($"Jedinična cena: {cenaPoBocici:N2} RSD");
             Console.WriteLine($"Ukupan iznos: {ukupno:N2} RSD");
             Console.WriteLine($"Tip prodaje: {tipProdaje}");
-            Console.WriteLine($"Način plaćanja: {nacinPlacanja}");
+            Console.WriteLine($"Način plaćanja: {RacunPomocneMetode.FormatirajNacinPlacanja(nacinPlacanja)}"); 
             Pauza("Pritisnite bilo koji taster za nastavak...");
         }
 
@@ -872,7 +872,8 @@ namespace Presentation.Meni
               
                 foreach (var r in racuni)
                 {
-                    Console.WriteLine($"{r.Id,-38} | {r.UkupanIznos,8:N2} RSD | {r.TipProdaje,-12} | {r.NacinPlacanja,-16} | {r.DatumIzdavanja:dd.MM.yyyy HH:mm}");
+                    var formatiranNacinPlacanja = RacunPomocneMetode.FormatirajNacinPlacanja(r.NacinPlacanja);
+                    Console.WriteLine($"{r.Id,-38} | {r.UkupanIznos,8:N2} RSD | {r.TipProdaje,-12} | {formatiranNacinPlacanja,-16} | {r.DatumIzdavanja:dd.MM.yyyy HH:mm}");
                 }
 
                 Console.WriteLine(new string('-', 115));
